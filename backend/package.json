@@ -1,0 +1,31 @@
+{
+  "name": "vision-velocity-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vision Velocity — Next.js 16 (App Router) backend: Supabase-backed API routes, admin auth via proxy.ts, rate limiting, and audit logging.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "jose": "^5.9.6",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

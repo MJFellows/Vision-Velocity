@@ -1,0 +1,20 @@
+﻿# dependencies and build output
+node_modules/
+.next/
+out/
+build/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# environment files - never commit credentials (only the .env.example templates)
+.env
+.env.*
+!.env.example
+
+# editor/backup/log noise (backups may contain secrets)
+*.bak
+*.bak*
+*.log
+npm-debug.log*
+.DS_Store
