@@ -13,8 +13,8 @@
 export type OwnerPerson = 'rita' | 'natalie';
 export type CharitySubscriptionStatus = 'trial' | 'active' | 'inactive';
 export type OrderStatus = 'pending' | 'confirmed' | 'scheduled' | 'delivered' | 'cancelled';
-export type WoolworthsContactRole = 'category_manager' | 'store_manager' | 'supply_manager' | 'other';
-export type WoolworthsRelationshipStatus =
+export type SupplierContactRole = 'category_manager' | 'store_manager' | 'supply_manager' | 'other';
+export type SupplierRelationshipStatus =
   | 'interested'
   | 'meeting_scheduled'
   | 'proposal_submitted'
@@ -57,6 +57,20 @@ export interface BunningsStore {
   discovered_date: string | null; // date
   interaction_notes: string | null;
   is_active: boolean;
+  // National directory fields (populated for source = 'import')
+  bunnings_store_id: string | null;
+  suburb: string | null;
+  state: AuState | null;
+  postcode: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  store_email: string | null;
+  store_fax: string | null;
+  map_url: string | null;
+  services: string[];
+  opening_hours: OpeningHours | null;
+  opening_hours_raw: string | null;
+  source: 'manual' | 'import'; // manual = visited/entered by the team, import = national directory file
   created_at: string;
   updated_at: string;
   is_deleted: boolean;
@@ -68,6 +82,7 @@ export interface Charity {
   email: string | null;
   phone: string | null;
   location: string | null;
+  postcode: string | null; // 4 digits; used for same-postcode lookups
   contact_name: string | null;
   tax_id: string | null;
   subscription_status: CharitySubscriptionStatus;
@@ -114,14 +129,15 @@ export interface Order {
   is_deleted: boolean;
 }
 
-export interface WoolworthsContact {
+export interface SupplierContact {
   id: string;
+  supplier_chain: string; // e.g. Woolworths, Coles, IGA (see supplier_chains table)
   contact_person_name: string;
   contact_email: string | null;
   contact_phone: string | null;
-  contact_role: WoolworthsContactRole | null;
+  contact_role: SupplierContactRole | null;
   natalie_owner: boolean;
-  status: WoolworthsRelationshipStatus;
+  status: SupplierRelationshipStatus;
   last_contact_date: string | null;
   next_contact_date: string | null;
   discussion_summary: string | null;
@@ -129,6 +145,40 @@ export interface WoolworthsContact {
   supply_pricing_status: string | null;
   commercial_agreement_status: string | null;
   internal_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export type AuState = 'NSW' | 'VIC' | 'QLD' | 'WA' | 'SA' | 'TAS' | 'ACT' | 'NT';
+
+export type WeekdayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
+/** Normalised opening hours: 24-hour HH:MM times, or { closed: true }. Days may be missing if unknown. */
+export type OpeningHours = Partial<Record<WeekdayKey, { open: string; close: string } | { closed: true }>>;
+
+export interface SupplierChain {
+  name: string;
+  display_order: number;
+}
+
+/** A single supplier store location (Woolworths, Coles, IGA, ...). */
+export interface Supplier {
+  id: string;
+  supplier_chain: string;
+  source_store_id: string | null;
+  store_name: string;
+  address: string | null;
+  suburb: string | null;
+  state: AuState;
+  postcode: string; // always 4 digits
+  phone: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  opening_hours: OpeningHours | null;
+  opening_hours_raw: string | null; // original source text, kept for provenance
+  facilities: string[];
+  is_active: boolean;
   created_at: string;
   updated_at: string;
   is_deleted: boolean;
@@ -320,3 +370,40 @@ export interface LoginResponse {
   user: AuthUser;
   session?: { access_token?: string; refresh_token?: string; expires_at?: number };
 }
+
+// ---------------------------------------------------------------------------
+// Events (a date + Bunnings store + charity, with supplier stores linked per event)
+// ---------------------------------------------------------------------------
+
+export type EventStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled';
+export type EventSupplierStatus = 'possible' | 'confirmed' | 'declined';
+
+export interface EventSupplierLink {
+  id: string; // event_suppliers row id
+  supplier_id: string;
+  status: EventSupplierStatus;
+  notes: string | null;
+  suppliers: Pick<Supplier, 'id' | 'supplier_chain' | 'store_name' | 'suburb' | 'state' | 'postcode'> | null;
+}
+
+export interface FundraisingEvent {
+  id: string;
+  event_date: string; // YYYY-MM-DD
+  bunnings_store_id: string;
+  charity_id: string;
+  status: EventStatus;
+  notes: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+  bunnings_stores: Pick<BunningsStore, 'id' | 'location' | 'suburb' | 'state' | 'postcode'> | null;
+  charities: Pick<Charity, 'id' | 'name' | 'postcode'> | null;
+  event_suppliers: EventSupplierLink[];
+}
+
+// Same-postcode lookup rows (see backend lib/same-postcode.ts)
+// distance_km is set only when a radius was requested (and the record could be placed).
+export type SamePostcodeSupplier = Pick<Supplier, 'id' | 'supplier_chain' | 'store_name' | 'address' | 'suburb' | 'state' | 'postcode' | 'phone'> & { distance_km?: number | null };
+export type SamePostcodeBunnings = Pick<BunningsStore, 'id' | 'location' | 'store_address' | 'suburb' | 'state' | 'postcode' | 'store_phone'> & { distance_km?: number | null };
+export type SamePostcodeCharity = Pick<Charity, 'id' | 'name' | 'location' | 'postcode' | 'subscription_status' | 'contact_name' | 'phone'> & { distance_km?: number | null };

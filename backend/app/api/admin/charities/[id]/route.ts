@@ -12,6 +12,7 @@ const updateCharitySchema = z
     email: z.string().email().nullable(),
     phone: z.string().nullable(),
     location: z.string().nullable(),
+    postcode: z.string().regex(/^[0-9]{4}$/, 'Postcode must be 4 digits').nullable(),
     contact_name: z.string().nullable(),
     tax_id: z.string().nullable(),
     subscription_status: z.enum(['trial', 'active', 'inactive']),

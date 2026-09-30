@@ -14,8 +14,9 @@ const items = [
   { href: '/admin/dashboard', label: 'Home', icon: HomeIcon },
   { href: '/admin/charities', label: 'Charities', icon: UsersIcon },
   { href: '/admin/orders', label: 'Orders', icon: CalendarIcon },
+  { href: '/admin/events', label: 'Events', icon: CalendarIcon },
   { href: '/admin/bunnings', label: 'Bunnings', icon: StoreIcon },
-  { href: '/admin/woolworths', label: 'Woolworths', icon: HandshakeIcon },
+  { href: '/admin/suppliers', label: 'Suppliers', icon: HandshakeIcon },
 ];
 
 export function MobileNav() {

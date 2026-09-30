@@ -8,19 +8,29 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Tabs } from '@/components/ui/Tabs';
+import type { FundraisingEvent } from '@/lib/types';
 import { CharityForm, type CharityFormValues } from '@/components/forms/CharityForm';
 import { InteractionForm, type InteractionFormValues } from '@/components/forms/InteractionForm';
-import { getCharity, updateCharity, approveCharity, createInteraction, listOrders, type CharityDetail, type OrderWithRelations } from '@/lib/adminApi';
+import { SamePostcodePanel, type PanelSection } from '@/components/SamePostcodePanel';
+import { getCharity, getCharitySamePostcode, updateCharity, approveCharity, createInteraction, listOrders, listEvents, type CharityDetail, type OrderWithRelations, type NearbyRadiusKm } from '@/lib/adminApi';
 
 export default function CharityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [charity, setCharity] = useState<CharityDetail | null>(null);
   const [orders, setOrders] = useState<OrderWithRelations[] | null>(null);
+  const [events, setEvents] = useState<FundraisingEvent[] | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingApproval, setConfirmingApproval] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelLoading, setPanelLoading] = useState(false);
+  const [panelError, setPanelError] = useState<string | null>(null);
+  const [panelPostcode, setPanelPostcode] = useState<string | null>(null);
+  const [panelRadius, setPanelRadius] = useState<NearbyRadiusKm>(0);
+  const [panelOrigin, setPanelOrigin] = useState<boolean | null>(null);
+  const [panelSections, setPanelSections] = useState<PanelSection[]>([]);
 
   const loadCharity = useCallback(async () => {
     try {
@@ -41,10 +51,20 @@ export default function CharityDetailPage() {
     }
   }, [id]);
 
+  const loadEvents = useCallback(async () => {
+    try {
+      const res = await listEvents({ charity_id: id, pageSize: 100 });
+      setEvents(res.data);
+    } catch {
+      setEvents([]);
+    }
+  }, [id]);
+
   useEffect(() => {
     loadCharity();
     loadOrders();
-  }, [loadCharity, loadOrders]);
+    loadEvents();
+  }, [loadCharity, loadOrders, loadEvents]);
 
   const handleEditSubmit = async (values: CharityFormValues) => {
     await updateCharity(id, {
@@ -52,11 +72,52 @@ export default function CharityDetailPage() {
       email: values.email || null,
       phone: values.phone || null,
       location: values.location || null,
+      postcode: values.postcode || null,
       contact_name: values.contact_name || null,
       tax_id: values.tax_id || null,
     });
     setIsEditing(false);
     await loadCharity();
+  };
+
+  const openSamePostcode = async (radius: NearbyRadiusKm = 0) => {
+    setPanelOpen(true);
+    setPanelRadius(radius);
+    setPanelLoading(true);
+    setPanelError(null);
+    const distanceText = (km: number | null | undefined) => (km != null ? ` · ${km} km` : '');
+    try {
+      const res = await getCharitySamePostcode(id, radius);
+      setPanelPostcode(res.postcode);
+      setPanelOrigin(res.origin_available);
+      setPanelSections([
+        {
+          title: 'Suppliers',
+          emptyText: radius ? 'No supplier stores in this area.' : 'No supplier stores in this postcode.',
+          items: res.data.suppliers.map((s) => ({
+            id: s.id,
+            href: `/admin/suppliers/${s.id}`,
+            primary: s.store_name,
+            secondary: `${[s.address, s.suburb, s.state, s.postcode].filter(Boolean).join(', ')}${distanceText(s.distance_km)}`,
+            badge: s.supplier_chain,
+          })),
+        },
+        {
+          title: 'Bunnings stores',
+          emptyText: radius ? 'No Bunnings stores in this area.' : 'No Bunnings stores in this postcode.',
+          items: res.data.bunnings_stores.map((b) => ({
+            id: b.id,
+            href: `/admin/bunnings/${b.id}`,
+            primary: b.location,
+            secondary: `${[b.store_address, b.suburb, b.state, b.postcode].filter(Boolean).join(', ')}${distanceText(b.distance_km)}`,
+          })),
+        },
+      ]);
+    } catch {
+      setPanelError('Could not load records for this postcode — try again.');
+    } finally {
+      setPanelLoading(false);
+    }
   };
 
   const handleApprove = async () => {
@@ -128,11 +189,29 @@ export default function CharityDetailPage() {
           {charity.subscription_status === 'trial' && !confirmingApproval && (
             <Button onClick={() => setConfirmingApproval(true)}>Approve</Button>
           )}
+          <Button variant="outline" onClick={() => openSamePostcode(0)}>
+            Suppliers &amp; Bunnings in same postcode
+          </Button>
           <Button variant="outline" onClick={() => setIsEditing((v) => !v)}>
             {isEditing ? 'Cancel' : 'Edit'}
           </Button>
         </div>
       </div>
+
+      {panelOpen && (
+        <SamePostcodePanel
+          title="Same postcode"
+          postcode={panelPostcode}
+          sections={panelSections}
+          isLoading={panelLoading}
+          error={panelError}
+          noPostcodeMessage="This charity has no postcode yet. Edit the charity and add one to find suppliers and Bunnings stores nearby."
+          radiusKm={panelRadius}
+          onRadiusChange={(r) => openSamePostcode(r)}
+          originAvailable={panelOrigin}
+          onClose={() => setPanelOpen(false)}
+        />
+      )}
 
       {confirmingApproval && (
         <Card className="mb-6 max-w-lg">
@@ -183,6 +262,10 @@ export default function CharityDetailPage() {
               <dd>{charity.location || '—'}</dd>
             </div>
             <div className="flex justify-between">
+              <dt className="text-charcoal/60">Postcode</dt>
+              <dd>{charity.postcode || '—'}</dd>
+            </div>
+            <div className="flex justify-between">
               <dt className="text-charcoal/60">ABN / tax ID</dt>
               <dd>{charity.tax_id || '—'}</dd>
             </div>
@@ -197,10 +280,45 @@ export default function CharityDetailPage() {
             label: 'Events',
             content: (
               <div className="space-y-3">
+                <Link href="/admin/events/new" className="inline-block text-sm text-accent underline">
+                  Add an event
+                </Link>
+                {events === null ? (
+                  <p className="text-sm text-charcoal/60">Loading…</p>
+                ) : events.length === 0 ? (
+                  <p className="text-sm text-charcoal/60">No events for this charity yet.</p>
+                ) : (
+                  events.map((ev) => (
+                    <Link key={ev.id} href={`/admin/events/${ev.id}`}>
+                      <Card className="flex items-center justify-between hover:border-accent">
+                        <div>
+                          <p className="font-medium text-navy">
+                            {new Date(`${ev.event_date}T00:00:00`).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                          </p>
+                          <p className="text-sm text-charcoal/60">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
+                          <p className="text-xs text-charcoal/60">
+                            Suppliers: {ev.event_suppliers.filter((x) => x.status === 'confirmed').length} confirmed ·{' '}
+                            {ev.event_suppliers.filter((x) => x.status === 'possible').length} possible ·{' '}
+                            {ev.event_suppliers.filter((x) => x.status === 'declined').length} declined
+                          </p>
+                        </div>
+                        <Badge tone={toneForStatus(ev.status)}>{ev.status}</Badge>
+                      </Card>
+                    </Link>
+                  ))
+                )}
+              </div>
+            ),
+          },
+          {
+            id: 'orders',
+            label: 'Orders',
+            content: (
+              <div className="space-y-3">
                 {orders === null ? (
                   <p className="text-sm text-charcoal/60">Loading…</p>
                 ) : orders.length === 0 ? (
-                  <p className="text-sm text-charcoal/60">No events for this charity yet.</p>
+                  <p className="text-sm text-charcoal/60">No orders for this charity yet.</p>
                 ) : (
                   orders.map((order) => (
                     <Link key={order.id} href={`/admin/orders/${order.id}`}>
