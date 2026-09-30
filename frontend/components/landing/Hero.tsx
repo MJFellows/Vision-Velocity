@@ -13,7 +13,7 @@ export function Hero() {
         </p>
         <p className="mx-auto mb-8 max-w-3xl text-base leading-relaxed text-charcoal/70 sm:mb-12 sm:text-lg">
           Running sausage sizzles and catering events for fundraising shouldn&apos;t be stressful. We partner with
-          Bunnings stores to make event logistics simple, proven and profitable — so your charity can raise more
+          local and chain suppliers across Australia to make event logistics simple, proven and profitable — so your charity can raise more
           funds with less work.
         </p>
         <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">

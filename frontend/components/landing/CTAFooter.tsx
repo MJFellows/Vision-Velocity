@@ -11,7 +11,7 @@ export function CTAFooter() {
         </p>
         <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
           <Link href="/charity/signup">
-            <Button size="lg" className="w-full bg-white text-navy hover:bg-grey sm:w-auto">
+            <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-grey sm:w-auto">
               Get Started Today
             </Button>
           </Link>

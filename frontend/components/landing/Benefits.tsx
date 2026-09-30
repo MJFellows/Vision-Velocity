@@ -7,7 +7,7 @@ const benefits = [
   {
     title: 'Proven locations',
     description:
-      'Our Bunnings partnerships are established and ready — the best, most accessible venues for high-traffic fundraising.',
+      'Our supplier partnerships are established and ready — the best, most accessible venues for high-traffic fundraising.',
   },
   {
     title: 'Professional support',

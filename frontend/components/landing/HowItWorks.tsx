@@ -7,7 +7,7 @@ const steps = [
   {
     number: 2,
     title: 'Choose a date & Bunnings location',
-    description: 'Pick an event date and select from our network of partner Bunnings stores.',
+    description: 'Pick an event date and select from our network of partner locations.',
   },
   {
     number: 3,
