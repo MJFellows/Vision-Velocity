@@ -3,7 +3,7 @@
  * audit trail. This is deliberately separate from the database's own
  * audit_log table, which is populated automatically by Postgres triggers
  * on charities, orders, packages, leads, admin_users, bunnings_stores, and
- * woolworths_contact (see the schema migration) and captures the full
+ * supplier_contact (see the schema migration) and captures the full
  * before/after row as JSON with no application code involved — that part
  * needs no help from here and cannot be bypassed by a bug in this file.
  *

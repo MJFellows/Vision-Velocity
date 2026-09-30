@@ -5,6 +5,7 @@ import { ValidationError, ConflictError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction } from '@/lib/audit';
+import { normaliseState, parsePostcodeFilter, safeSearchTerm } from '@/lib/location-filters';
 
 const createStoreSchema = z.object({
   location: z.string().min(1),
@@ -35,6 +36,24 @@ export async function GET(request: Request) {
       .order('location', { ascending: true });
 
     if (activeOnly) query = query.eq('is_active', true);
+
+    // Optional filters: ?state=QLD&postcode=42*&source=manual|import&search=text
+    let state: string | null;
+    let postcode: ReturnType<typeof parsePostcodeFilter>;
+    try {
+      state = normaliseState(url.searchParams.get('state'));
+      postcode = parsePostcodeFilter(url.searchParams.get('postcode'));
+    } catch (e) {
+      throw new ValidationError(e instanceof Error ? e.message : 'Invalid filter');
+    }
+    const source = url.searchParams.get('source');
+    const search = safeSearchTerm(url.searchParams.get('search'));
+    if (state) query = query.eq('state', state);
+    if (postcode) {
+      query = postcode.kind === 'exact' ? query.eq('postcode', postcode.value) : query.like('postcode', postcode.pattern);
+    }
+    if (source === 'manual' || source === 'import') query = query.eq('source', source);
+    if (search) query = query.or(`location.ilike.%${search}%,suburb.ilike.%${search}%`);
 
     const { data, error } = await query;
     if (error) throw error;

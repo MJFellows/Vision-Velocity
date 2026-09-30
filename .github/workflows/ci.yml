@@ -1,0 +1,75 @@
+name: CI
+
+# Runs on every pull request into main/staging, and on every push to those
+# branches (i.e. after a merge). Vercel's own Git integration performs the
+# deployments; this workflow is the quality gate that must be green first.
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: ${{ matrix.app }} - lint, typecheck, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    # Placeholder values only: they let `next build` succeed without secrets.
+    # Real values live in Vercel's environment settings, never in GitHub.
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+      JWT_SECRET: ci-placeholder-secret-0123456789abcdef
+      CLIENT_APP_URL: http://localhost:3001
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Format check (advisory)
+        # No Prettier config exists yet, so this reports only; it does not fail the build.
+        continue-on-error: true
+        run: npx --yes prettier@3 --check "app/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}"
+      - name: Type check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+
+  secret-scan:
+    name: Block committed secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if an env file or key-like string is tracked
+        run: |
+          if git ls-files | grep -E '(^|/)\.env(\.[^/]*)?$' | grep -v '\.env\.example$'; then
+            echo "A real .env file is tracked in Git." ; exit 1
+          fi
+          if git grep -nE '(re_[A-Za-z0-9]{20,}|sb_secret_[A-Za-z0-9_-]{10,}|eyJ[A-Za-z0-9_-]{30,}\.[A-Za-z0-9_-]{30,}\.[A-Za-z0-9_-]{10,})' -- . ':!*.md'; then
+            echo "Possible secret found in tracked files." ; exit 1
+          fi

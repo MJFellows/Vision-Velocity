@@ -39,7 +39,7 @@ app/
     admin/charities               — admin-only CRUD (list/create, get/update)
     admin/orders                  — admin-only CRUD
     admin/bunnings                — admin-only CRUD (incl. [id]/magic-link — see 2026-09-24 note)
-    admin/woolworths               — admin-only singleton CRUD (Task 2.4)
+    admin/supplier-contact          — admin-only singleton CRUD (Task 2.4)
     admin/interactions             — admin-only CRM journal (Task 2.2/2.3)
     public/landing-page-data      — unauthenticated, rate-limited, public-read only
     public/bunnings-stores        — unauthenticated, public store picker for signup (Task 3.1)
@@ -63,7 +63,7 @@ proxy.ts        — CORS, rate limiting, admin JWT gate, request logging,
 **Database level — `audit_log`** (see the schema migration, not this repo):
 a Postgres trigger (`audit_row_change()`) fires on every INSERT/UPDATE/DELETE
 to `charities`, `orders`, `packages`, `leads`, `admin_users`,
-`bunnings_stores`, and `woolworths_contact`, capturing the full before/after
+`bunnings_stores`, and `supplier_contact`, capturing the full before/after
 row as JSON automatically — no application code involved, so it can't be
 bypassed by a bug here. Indexed on `timestamp` (that table has no
 `created_at` column — audit events use `timestamp` throughout).
@@ -220,7 +220,7 @@ Verified together with the frontend changes in an isolated sandbox: clean
 build` producing all 12 expected routes (11 + the new interactions route).
 
 **Correction (2026-09-24, later the same day):** the note above about
-`/api/admin/woolworths` not existing is now out of date — see the section
+`/api/admin/supplier-contact` not existing is now out of date — see the section
 below.
 
 ## Tasks 2.4, 3.1, 3.2 additions (2026-09-24)
@@ -232,8 +232,8 @@ detail is in the Claude project docs — `claude/task-2-4-retail-partner-trackin
 `claude/task-3-1-landing-and-signup.md`, `claude/task-3-2-bunnings-ao-portal.md`
 — this note is a pointer, not a duplicate.
 
-- `admin/woolworths` — GET/POST/PATCH singleton pattern (no DB uniqueness
-  constraint on `woolworths_contact`; enforced at the API layer).
+- `admin/supplier-contact` — GET/POST/PATCH singleton pattern (no DB uniqueness
+  constraint on `supplier_contact`; enforced at the API layer).
 - `admin/bunnings/[id]/magic-link` — admin-gated, generates a 7-day AO
   portal magic link.
 - `public/bunnings-stores`, `public/charities/signup` — service-role client

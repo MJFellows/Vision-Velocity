@@ -725,13 +725,13 @@ Vision Velocity Admin Dashboard
 };
 
 // ============================================
-// EMAIL TEMPLATE 7: WOOLWORTHS STATUS UPDATE
+// EMAIL TEMPLATE 7: SUPPLIER STATUS UPDATE
 // ============================================
 
-export const woolworthsStatusUpdateTemplate: EmailTemplate = {
-  id: 'woolworths_status_update',
-  name: 'Woolworths Status Update',
-  subject: 'Woolworths Negotiation Update – {{milestone}} Reached',
+export const supplierStatusUpdateTemplate: EmailTemplate = {
+  id: 'supplier_status_update',
+  name: 'Supplier Status Update',
+  subject: '{{supplierChain}} Negotiation Update – {{milestone}} Reached',
   htmlBody: `
 <!DOCTYPE html>
 <html>
@@ -749,13 +749,13 @@ export const woolworthsStatusUpdateTemplate: EmailTemplate = {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Woolworths Partnership Progress</h1>
+      <h1>{{supplierChain}} Partnership Progress</h1>
     </div>
 
     <div class="content">
       <p>Dear Natalie,</p>
 
-      <p>Congratulations! We've reached a significant milestone in the Woolworths negotiation.</p>
+      <p>Congratulations! We've reached a significant milestone in the {{supplierChain}} negotiation.</p>
 
       <div class="milestone">
         <h2>{{milestone}} ✓</h2>
@@ -784,7 +784,7 @@ export const woolworthsStatusUpdateTemplate: EmailTemplate = {
         <li>Follow up on {{deliveryStatus}} and {{supplyStatus}} items</li>
       </ul>
 
-      <p>This is excellent progress on the Woolworths partnership. Keep up the great work!</p>
+      <p>This is excellent progress on the {{supplierChain}} partnership. Keep up the great work!</p>
 
       <p>Best regards,<br>
       Mark & The Vision Velocity Team</p>
@@ -800,7 +800,7 @@ export const woolworthsStatusUpdateTemplate: EmailTemplate = {
   `,
   plainTextBody: `Dear Natalie,
 
-Congratulations! We've reached a significant milestone in the Woolworths negotiation.
+Congratulations! We've reached a significant milestone in the {{supplierChain}} negotiation.
 
 {{milestone}} ✓
 Date Reached: {{milestoneDate}}
@@ -829,7 +829,7 @@ NEXT STEPS
 - Prepare materials for {{nextMilestone}} discussion
 - Follow up on {{deliveryStatus}} and {{supplyStatus}} items
 
-This is excellent progress on the Woolworths partnership. Keep up the great work!
+This is excellent progress on the {{supplierChain}} partnership. Keep up the great work!
 
 Best regards,
 Mark & The Vision Velocity Team
@@ -837,7 +837,7 @@ Mark & The Vision Velocity Team
 ---
 Vision Velocity © 2026. All rights reserved.
   `,
-  variables: ['milestone', 'milestoneDate', 'progressPercentage', 'storeManagerName', 'lastContactDate', 'nextMilestone', 'nextMilestoneDate', 'deliveryStatus', 'supplyStatus', 'commercialStatus', 'recentNotes', 'trackingPixel'],
+  variables: ['supplierChain', 'milestone', 'milestoneDate', 'progressPercentage', 'storeManagerName', 'lastContactDate', 'nextMilestone', 'nextMilestoneDate', 'deliveryStatus', 'supplyStatus', 'commercialStatus', 'recentNotes', 'trackingPixel'],
 };
 
 // ============================================
@@ -851,7 +851,7 @@ export const emailTemplates: Record<string, EmailTemplate> = {
   event_reminder_24h: eventReminderTemplate,
   event_completed: eventCompletedTemplate,
   admin_notification_signup: adminNotificationTemplate,
-  woolworths_status_update: woolworthsStatusUpdateTemplate,
+  supplier_status_update: supplierStatusUpdateTemplate,
 };
 
 /**

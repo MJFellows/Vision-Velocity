@@ -1,18 +1,20 @@
 /**
- * GET   /api/admin/woolworths
- * POST  /api/admin/woolworths
- * PATCH /api/admin/woolworths
+ * GET   /api/admin/supplier-contact?supplier_chain=Woolworths
+ * POST  /api/admin/supplier-contact
+ * PATCH /api/admin/supplier-contact?supplier_chain=Woolworths
  *
- * Woolworths negotiation tracking (Task 2.4). `woolworths_contact` is a
- * singleton in practice — Vision Velocity is negotiating with one
- * Woolworths contact at a time — but nothing in the schema enforces that
- * at the database level, so this route enforces it in code: GET returns
- * the earliest non-deleted row (or null if none exists yet), POST refuses
- * to create a second one, and PATCH always targets that same row rather
- * than trusting a client-supplied id.
+ * Supplier negotiation tracking (Task 2.4). There is one national
+ * negotiation record per supplier chain (Woolworths, Coles, IGA, ...),
+ * held in `supplier_contact`. The database enforces this with a partial
+ * unique index on supplier_chain (where is_deleted = false); this route
+ * mirrors it: GET returns that chain's record (or null if none exists yet),
+ * POST refuses to create a second one for the same chain, and PATCH always
+ * targets the chain's existing row rather than trusting a client-supplied id.
+ * supplier_chain defaults to 'Woolworths' when omitted, so existing callers
+ * keep working.
  *
  * Admin-only (enforced by proxy.ts, and independently by Postgres RLS via
- * woolworths_contact_admin_all — see the schema). All reads/writes go
+ * supplier_contact_admin_all — see the schema). All reads/writes go
  * through getSupabaseForRequest(), i.e. as the calling admin's own JWT.
  */
 
@@ -24,10 +26,13 @@ import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges } from '@/lib/audit';
 import { buildCorsHeaders } from '@/utils/cors';
 
+const DEFAULT_CHAIN = 'Woolworths';
+
 const contactRoleEnum = z.enum(['category_manager', 'store_manager', 'supply_manager', 'other']);
 const statusEnum = z.enum(['interested', 'meeting_scheduled', 'proposal_submitted', 'negotiating', 'agreed']);
 
-const createWoolworthsSchema = z.object({
+const createSupplierContactSchema = z.object({
+  supplier_chain: z.string().min(1).max(50).optional(),
   contact_person_name: z.string().min(2).max(100),
   contact_email: z.string().email().optional().nullable(),
   contact_phone: z.string().optional().nullable(),
@@ -42,12 +47,18 @@ const createWoolworthsSchema = z.object({
   internal_notes: z.string().optional().nullable(),
 });
 
-const updateWoolworthsSchema = createWoolworthsSchema.partial();
+// The chain identifies which record to update, so it is taken from the query string, not the patch body.
+const updateSupplierContactSchema = createSupplierContactSchema.omit({ supplier_chain: true }).partial();
 
-async function getSingletonRow(supabase: ReturnType<typeof getSupabaseForRequest>) {
+function chainFromRequest(request: Request): string {
+  return new URL(request.url).searchParams.get('supplier_chain')?.trim() || DEFAULT_CHAIN;
+}
+
+async function getSingletonRow(supabase: ReturnType<typeof getSupabaseForRequest>, supplierChain: string) {
   const { data, error } = await supabase
-    .from('woolworths_contact')
+    .from('supplier_contact')
     .select('*')
+    .eq('supplier_chain', supplierChain)
     .eq('is_deleted', false)
     .order('created_at', { ascending: true })
     .limit(1);
@@ -59,7 +70,7 @@ export async function GET(request: Request) {
   const cors = buildCorsHeaders(request.headers.get('origin'));
   try {
     const supabase = getSupabaseForRequest(request);
-    const data = await getSingletonRow(supabase);
+    const data = await getSingletonRow(supabase, chainFromRequest(request));
     return NextResponse.json({ data }, { headers: cors });
   } catch (error) {
     const res = handleApiError(error);
@@ -78,23 +89,24 @@ export async function POST(request: Request) {
 
   try {
     requestBody = await request.json().catch(() => null);
-    const parsed = createWoolworthsSchema.safeParse(requestBody);
+    const parsed = createSupplierContactSchema.safeParse(requestBody);
     if (!parsed.success) {
       throw new ValidationError(
-        'Invalid Woolworths contact data',
+        'Invalid Supplier contact data',
         Object.fromEntries(parsed.error.issues.map((i) => [i.path.join('.'), i.message]))
       );
     }
 
     const supabase = getSupabaseForRequest(request);
-    const existing = await getSingletonRow(supabase);
+    const supplierChain = parsed.data.supplier_chain ?? DEFAULT_CHAIN;
+    const existing = await getSingletonRow(supabase, supplierChain);
     if (existing) {
-      throw new ConflictError('A Woolworths negotiation contact already exists — use PATCH to update it');
+      throw new ConflictError(`A ${supplierChain} negotiation contact already exists — use PATCH to update it`);
     }
 
     const { data, error } = await supabase
-      .from('woolworths_contact')
-      .insert(parsed.data)
+      .from('supplier_contact')
+      .insert({ ...parsed.data, supplier_chain: supplierChain })
       .select()
       .single();
     if (error) throw error;
@@ -102,9 +114,9 @@ export async function POST(request: Request) {
     await logAdminAction({
       adminUserId,
       userEmail: adminEmail,
-      action: 'created_woolworths_contact',
-      description: `Added Woolworths negotiation contact "${data.contact_person_name}"`,
-      entityType: 'woolworths_contact',
+      action: 'created_supplier_contact',
+      description: `Added ${supplierChain} negotiation contact "${data.contact_person_name}"`,
+      entityType: 'supplier_contact',
       entityId: data.id,
       changes: { before: null, after: parsed.data },
       requestParams: parsed.data,
@@ -119,8 +131,8 @@ export async function POST(request: Request) {
       await logAdminAction({
         adminUserId,
         userEmail: adminEmail,
-        action: 'create_woolworths_contact_failed',
-        entityType: 'woolworths_contact',
+        action: 'create_supplier_contact_failed',
+        entityType: 'supplier_contact',
         requestParams: requestBody as Record<string, unknown> | null,
         ipAddress,
         userAgent,
@@ -144,10 +156,10 @@ export async function PATCH(request: Request) {
 
   try {
     requestBody = await request.json().catch(() => null);
-    const parsed = updateWoolworthsSchema.safeParse(requestBody);
+    const parsed = updateSupplierContactSchema.safeParse(requestBody);
     if (!parsed.success) {
       throw new ValidationError(
-        'Invalid Woolworths contact data',
+        'Invalid Supplier contact data',
         Object.fromEntries(parsed.error.issues.map((i) => [i.path.join('.'), i.message]))
       );
     }
@@ -156,13 +168,14 @@ export async function PATCH(request: Request) {
     }
 
     const supabase = getSupabaseForRequest(request);
-    const before = await getSingletonRow(supabase);
+    const supplierChain = chainFromRequest(request);
+    const before = await getSingletonRow(supabase, supplierChain);
     if (!before) {
-      throw new NotFoundError('No Woolworths negotiation contact exists yet — create one first');
+      throw new NotFoundError(`No ${supplierChain} negotiation contact exists yet — create one first`);
     }
 
     const { data, error } = await supabase
-      .from('woolworths_contact')
+      .from('supplier_contact')
       .update(parsed.data)
       .eq('id', before.id)
       .select()
@@ -172,9 +185,9 @@ export async function PATCH(request: Request) {
     await logAdminAction({
       adminUserId,
       userEmail: adminEmail,
-      action: 'updated_woolworths_contact',
-      description: 'Updated Woolworths negotiation status',
-      entityType: 'woolworths_contact',
+      action: 'updated_supplier_contact',
+      description: `Updated ${supplierChain} negotiation status`,
+      entityType: 'supplier_contact',
       entityId: data.id,
       changes: diffChanges(before, data),
       requestParams: parsed.data,
@@ -189,8 +202,8 @@ export async function PATCH(request: Request) {
       await logAdminAction({
         adminUserId,
         userEmail: adminEmail,
-        action: 'update_woolworths_contact_failed',
-        entityType: 'woolworths_contact',
+        action: 'update_supplier_contact_failed',
+        entityType: 'supplier_contact',
         requestParams: requestBody as Record<string, unknown> | null,
         ipAddress,
         userAgent,

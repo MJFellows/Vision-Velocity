@@ -25,11 +25,12 @@ export interface BunningsStore {
 }
 
 /**
- * Woolworths Negotiation Contact Type
- * Represents the current status of Woolworths partnership negotiations
+ * Supplier Negotiation Contact Type
+ * Represents the current status of partnership negotiations with one supplier chain
  */
-export interface WoolworthsContact {
+export interface SupplierContact {
   id: string;
+  supplier_chain: string; // 'Woolworths' | 'Coles' | 'IGA' | ... (see supplier_chains table)
   primary_owner: string; // Usually 'natalie'
   status: 'interested' | 'meeting_scheduled' | 'proposal_submitted' | 'negotiating' | 'agreed';
   store_manager_name: string | null;
@@ -54,7 +55,7 @@ export interface AdminActionLogEntry {
   id: string;
   admin_user_id: string;
   action: 'CREATE' | 'UPDATE' | 'DELETE';
-  entity_type: string; // e.g., 'bunnings_stores', 'woolworths_contact'
+  entity_type: string; // e.g., 'bunnings_stores', 'supplier_contact'
   entity_id: string;
   changes: Record<string, any> | null; // Field-level diff
   request_params: Record<string, any> | null;
@@ -103,4 +104,4 @@ export interface ApiUpdateResponse<T> {
 
 // Example usage in components:
 // const [stores, setStores] = useState<BunningsStore[]>([]);
-// const [woolworths, setWoolworths] = useState<WoolworthsContact | null>(null);
+// const [supplierContact, setSupplierContact] = useState<SupplierContact | null>(null);

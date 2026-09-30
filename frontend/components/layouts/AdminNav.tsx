@@ -9,8 +9,10 @@ const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard' },
   { href: '/admin/charities', label: 'Charities' },
   { href: '/admin/orders', label: 'Orders' },
+  { href: '/admin/events', label: 'Events' },
   { href: '/admin/bunnings', label: 'Bunnings' },
-  { href: '/admin/woolworths', label: 'Woolworths' },
+  { href: '/admin/suppliers', label: 'Suppliers' },
+  { href: '/admin/supplier-status', label: 'Supplier status' },
 ];
 
 export function AdminNav() {

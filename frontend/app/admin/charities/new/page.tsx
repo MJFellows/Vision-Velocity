@@ -15,6 +15,7 @@ export default function NewCharityPage() {
       email: values.email || null,
       phone: values.phone || null,
       location: values.location || null,
+      postcode: values.postcode || null,
       contact_name: values.contact_name || null,
       tax_id: values.tax_id || null,
     });

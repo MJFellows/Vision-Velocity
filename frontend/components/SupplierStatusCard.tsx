@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/Card';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
-import type { WoolworthsContact } from '@/lib/types';
+import type { SupplierContact } from '@/lib/types';
 
 const STATUS_STAGES = [
   { key: 'interested', label: 'Interested', description: 'Initial contact established' },
@@ -19,7 +19,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const formatDate = (value: string | null) => (value ? new Date(value).toLocaleDateString('en-AU') : 'Not set');
 
-export function WoolworthsStatusCard({ contact }: { contact: WoolworthsContact }) {
+export function SupplierStatusCard({ contact }: { contact: SupplierContact }) {
   const currentStageIndex = STATUS_STAGES.findIndex((s) => s.key === contact.status);
 
   return (

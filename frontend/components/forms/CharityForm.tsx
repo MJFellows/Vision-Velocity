@@ -12,6 +12,7 @@ export const charityFormSchema = z.object({
   email: z.string().email('Enter a valid email').or(z.literal('')).optional(),
   phone: z.string().optional(),
   location: z.string().optional(),
+  postcode: z.string().regex(/^[0-9]{4}$/, 'Enter a 4-digit postcode').or(z.literal('')).optional(),
   contact_name: z.string().optional(),
   tax_id: z.string().optional(),
 });
@@ -24,6 +25,7 @@ function charityToFormValues(charity?: Partial<Charity>): CharityFormValues {
     email: charity?.email ?? '',
     phone: charity?.phone ?? '',
     location: charity?.location ?? '',
+    postcode: charity?.postcode ?? '',
     contact_name: charity?.contact_name ?? '',
     tax_id: charity?.tax_id ?? '',
   };
@@ -42,6 +44,7 @@ function CharityFields() {
       <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
       <Input label="Phone" error={errors.phone?.message} {...register('phone')} />
       <Input label="Location" error={errors.location?.message} {...register('location')} />
+      <Input label="Postcode" inputMode="numeric" maxLength={4} error={errors.postcode?.message} helperText="Used to find Bunnings stores and suppliers in the same postcode" {...register('postcode')} />
       <Input label="ABN / tax ID" error={errors.tax_id?.message} {...register('tax_id')} />
     </div>
   );
