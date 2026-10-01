@@ -38,7 +38,7 @@ export default function AdminOrdersPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1>Orders</h1>
         <Link href="/admin/orders/new">
-          <Button>+ Add event</Button>
+          <Button>+ New order</Button>
         </Link>
       </div>
 

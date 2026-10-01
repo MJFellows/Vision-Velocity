@@ -7,6 +7,8 @@ import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Select } from '@/components/ui/Select';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { OrderForm, type toOrderPayload } from '@/components/forms/OrderForm';
 import { getOrder, updateOrder } from '@/lib/adminApi';
 import type { OrderStatus } from '@/lib/types';
 import type { OrderWithRelations } from '@/lib/adminApi';
@@ -24,6 +26,8 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<OrderWithRelations | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -37,6 +41,13 @@ export default function OrderDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const handleEditSubmit = async (payload: ReturnType<typeof toOrderPayload>) => {
+    await updateOrder(id, payload);
+    setIsEditing(false);
+    setMessage('Order saved.');
+    await load();
+  };
 
   const handleStatusChange = async (status: OrderStatus) => {
     setIsSaving(true);
@@ -80,11 +91,33 @@ export default function OrderDetailPage() {
           <h1 className="mb-1">{order.charities?.name ?? 'Order'}</h1>
           <Badge tone={toneForStatus(order.status)}>{order.status}</Badge>
         </div>
+        {!isEditing && (
+          <Button
+            variant="outline"
+            onClick={() => {
+              setMessage(null);
+              setIsEditing(true);
+            }}
+          >
+            Edit
+          </Button>
+        )}
       </div>
 
+      {message && <p className="mb-4 text-sm text-green-700">{message}</p>}
+      {error && order && <p className="mb-4 text-sm text-red-600">{error}</p>}
+
+      {isEditing ? (
+        <Card className="mb-6 max-w-lg">
+          <CardHeader>
+            <CardTitle>Edit order</CardTitle>
+          </CardHeader>
+          <OrderForm order={order} onSubmit={handleEditSubmit} onCancel={() => setIsEditing(false)} submitLabel="Save changes" />
+        </Card>
+      ) : (
       <Card className="mb-6 max-w-lg">
         <CardHeader>
-          <CardTitle>Event details</CardTitle>
+          <CardTitle>Order details</CardTitle>
         </CardHeader>
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -93,7 +126,7 @@ export default function OrderDetailPage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-charcoal/60">Event date</dt>
-            <dd>{order.event_date}</dd>
+            <dd>{new Date(`${order.event_date.slice(0, 10)}T00:00:00`).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-charcoal/60">Delivery address</dt>
@@ -113,10 +146,11 @@ export default function OrderDetailPage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-charcoal/60">Total price</dt>
-            <dd>${Number(order.total_price_aud).toLocaleString('en-AU')}</dd>
+            <dd>{Number(order.total_price_aud).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}</dd>
           </div>
         </dl>
       </Card>
+      )}
 
       <Card className="max-w-lg">
         <CardHeader>
