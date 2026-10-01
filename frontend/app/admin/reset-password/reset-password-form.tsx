@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { api } from '@/lib/api';
 
 export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -79,30 +80,22 @@ export default function ResetPasswordForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Failed to reset password');
-        return;
-      }
-
+      await api.post(
+        '/api/auth/reset-password',
+        { code, password },
+        true // skipAuth: true because this endpoint is public
+      );
       setSuccess(true);
       // Redirect to login after 2 seconds
       setTimeout(() => {
         window.location.href = '/admin/login';
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An error occurred');
+      }
     } finally {
       setLoading(false);
     }
