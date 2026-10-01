@@ -1,9 +1,9 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -14,33 +14,34 @@ export default function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   // Validate password requirements
-  const validatePassword = (pwd: string): string[] => {
-    const errors: string[] = [];
+  const validatePassword = (pwd: string): string | null => {
     if (pwd.length < 8) {
-      errors.push('Password must be at least 8 characters');
+      return 'Password must be at least 8 characters';
     }
     if (!/[A-Z]/.test(pwd)) {
-      errors.push('Password must contain an uppercase letter');
+      return 'Password must contain an uppercase letter';
     }
     if (!/\d/.test(pwd)) {
-      errors.push('Password must contain a number');
+      return 'Password must contain a number';
     }
-    return errors;
+    return null;
   };
 
   if (!code || type !== 'recovery') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md p-8">
-          <h1 className="text-2xl font-bold text-red-600">Invalid Reset Link</h1>
-          <p className="mt-4 text-gray-700">
+      <div className="flex min-h-screen items-center justify-center bg-grey/10 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-red-600">Invalid Reset Link</CardTitle>
+          </CardHeader>
+          <p className="text-charcoal/80">
             The password reset link is invalid or has expired. Please request a new one.
           </p>
-          <a href="/admin/login" className="mt-6 inline-block text-blue-600 hover:underline">
+          <a href="/admin/login" className="mt-6 inline-block text-accent hover:underline">
             Back to Login
           </a>
         </Card>
@@ -52,9 +53,9 @@ export default function ResetPasswordForm() {
     const pwd = e.target.value;
     setPassword(pwd);
     if (pwd) {
-      setPasswordErrors(validatePassword(pwd));
+      setPasswordError(validatePassword(pwd));
     } else {
-      setPasswordErrors([]);
+      setPasswordError(null);
     }
   };
 
@@ -69,9 +70,9 @@ export default function ResetPasswordForm() {
     }
 
     // Validate password requirements
-    const errors = validatePassword(password);
-    if (errors.length > 0) {
-      setPasswordErrors(errors);
+    const pwd_error = validatePassword(password);
+    if (pwd_error) {
+      setPasswordError(pwd_error);
       return;
     }
 
@@ -109,10 +110,12 @@ export default function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md p-8">
-          <h1 className="text-2xl font-bold text-green-600">Password Reset Successful</h1>
-          <p className="mt-4 text-gray-700">
+      <div className="flex min-h-screen items-center justify-center bg-grey/10 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-green-600">Password Reset Successful</CardTitle>
+          </CardHeader>
+          <p className="text-charcoal/80">
             Your password has been reset. Redirecting to login...
           </p>
         </Card>
@@ -121,74 +124,56 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-8">
-        <h1 className="mb-2 text-2xl font-bold">Reset Your Password</h1>
-        <p className="mb-6 text-gray-600">Enter your new password below</p>
+    <div className="flex min-h-screen items-center justify-center bg-grey/10 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Reset Your Password</CardTitle>
+        </CardHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+            <div className="rounded-card bg-red-50 p-3 text-sm text-red-700 border border-red-200">
               {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              New Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder="Enter new password"
-              className="mt-1"
-              disabled={loading}
-              required
-            />
-            {passwordErrors.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {passwordErrors.map((err, idx) => (
-                  <p key={idx} className="text-xs text-red-600">
-                    • {err}
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
+          <Input
+            label="New Password"
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder="Enter new password"
+            disabled={loading}
+            error={passwordError || undefined}
+            required
+          />
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="mt-1"
-              disabled={loading}
-              required
-            />
-          </div>
+          <Input
+            label="Confirm Password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            disabled={loading}
+            required
+          />
 
           <Button
             type="submit"
-            disabled={loading || passwordErrors.length > 0}
-            className="w-full"
+            disabled={loading || !!passwordError}
+            isLoading={loading}
+            className="w-full mt-6"
           >
-            {loading ? 'Resetting...' : 'Reset Password'}
+            Reset Password
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-6 pt-4 border-t border-grey text-center text-sm text-charcoal/60">
           Remember your password?{' '}
-          <a href="/admin/login" className="text-blue-600 hover:underline">
+          <a href="/admin/login" className="text-accent hover:underline">
             Back to Login
           </a>
-        </p>
+        </div>
       </Card>
     </div>
   );
