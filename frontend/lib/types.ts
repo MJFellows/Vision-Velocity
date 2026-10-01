@@ -178,6 +178,9 @@ export interface Supplier {
   opening_hours: OpeningHours | null;
   opening_hours_raw: string | null; // original source text, kept for provenance
   facilities: string[];
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_mobile: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -377,6 +380,20 @@ export interface LoginResponse {
 
 export type EventStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled';
 export type EventSupplierStatus = 'possible' | 'confirmed' | 'declined';
+export type EventCoverType = 'inside' | 'outside_covered' | 'outside_uncovered';
+
+export const EVENT_COVER_LABELS: Record<EventCoverType, string> = {
+  inside: 'Inside',
+  outside_covered: 'Outside, under cover',
+  outside_uncovered: 'Outside, not under cover',
+};
+
+export interface EventPackageLink {
+  id: string; // event_packages row id
+  package_id: string;
+  quantity: number;
+  packages: Pick<Package, 'id' | 'name' | 'base_price_aud'> | null;
+}
 
 export interface EventSupplierLink {
   id: string; // event_suppliers row id
@@ -393,10 +410,19 @@ export interface FundraisingEvent {
   charity_id: string;
   status: EventStatus;
   notes: string | null;
+  event_name: string | null;
+  estimated_hotdogs: number | null;
+  estimated_staff: number | null;
+  number_of_shifts: number | null;
+  cover_type: EventCoverType | null;
+  actual_hotdogs_sold: number | null;
+  number_of_sales: number | null;
+  sales_value_aud: number | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   is_deleted: boolean;
+  event_packages: EventPackageLink[];
   bunnings_stores: Pick<BunningsStore, 'id' | 'location' | 'suburb' | 'state' | 'postcode'> | null;
   charities: Pick<Charity, 'id' | 'name' | 'postcode'> | null;
   event_suppliers: EventSupplierLink[];

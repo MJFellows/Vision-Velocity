@@ -6,20 +6,28 @@ import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { StatCard } from '@/components/ui/StatCard';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth';
-import { listCharities, listOrders, listBunningsStores } from '@/lib/adminApi';
+import { listCharities, listEvents, listOrders, listBunningsStores } from '@/lib/adminApi';
 
-function startOfWeek(): string {
-  const now = new Date();
-  const day = now.getDay(); // 0 = Sunday
-  const diff = now.getDate() - day;
-  return new Date(now.getFullYear(), now.getMonth(), diff).toISOString().slice(0, 10);
+/** YYYY-MM-DD in the browser's local time zone (toISOString would shift to UTC). */
+function localDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
+/** Monday of the current week (Australian business week, Monday to Sunday). */
+function startOfWeek(): string {
+  const now = new Date();
+  const daysSinceMonday = (now.getDay() + 6) % 7; // getDay(): 0 = Sunday
+  return localDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysSinceMonday));
+}
+
+/** Sunday of the current week. */
 function endOfWeek(): string {
   const now = new Date();
-  const day = now.getDay();
-  const diff = now.getDate() - day + 6;
-  return new Date(now.getFullYear(), now.getMonth(), diff).toISOString().slice(0, 10);
+  const daysSinceMonday = (now.getDay() + 6) % 7;
+  return localDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysSinceMonday + 6));
 }
 
 function startOfYear(): string {
@@ -45,10 +53,11 @@ export default function AdminDashboardPage() {
 
     async function loadStats() {
       try {
-        const [allCharities, trialCharities, weekOrders, ytdOrders, stores] = await Promise.all([
+        const [allCharities, trialCharities, weekEvents, ytdOrders, stores] = await Promise.all([
           listCharities({ pageSize: 1 }),
           listCharities({ status: 'trial', pageSize: 1 }),
-          listOrders({ from: startOfWeek(), to: endOfWeek(), pageSize: 1 }),
+          // Events (not orders) dated Monday–Sunday of this week; cancelled ones are excluded below.
+          listEvents({ from: startOfWeek(), to: endOfWeek(), pageSize: 100 }),
           listOrders({ from: startOfYear(), pageSize: 100 }),
           listBunningsStores(true),
         ]);
@@ -62,7 +71,7 @@ export default function AdminDashboardPage() {
         setStats({
           totalCharities: allCharities.pagination.total,
           trialCharities: trialCharities.pagination.total,
-          eventsThisWeek: weekOrders.pagination.total,
+          eventsThisWeek: weekEvents.data.filter((e) => e.status !== 'cancelled').length,
           bunningsStores: stores.data.length,
           revenueYtd,
           // pageSize caps at 100 server-side — if there are more YTD orders than that, the sum below is a lower bound, not exact.

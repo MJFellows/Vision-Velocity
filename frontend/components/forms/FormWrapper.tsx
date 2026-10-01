@@ -38,7 +38,19 @@ export function FormWrapper<T extends FieldValues>({
     try {
       await onSubmit(values);
     } catch (err) {
-      setSubmitError(err instanceof ApiRequestError ? err.message : 'Something went wrong. Please try again.');
+      if (err instanceof ApiRequestError) {
+        // Include field-level details from a 400 so the user can see what to fix.
+        const details =
+          err.details && typeof err.details === 'object'
+            ? Object.values(err.details as Record<string, string>).join(' ')
+            : '';
+        setSubmitError(details ? `${err.message}: ${details}` : err.message);
+      } else if (err instanceof Error && err.constructor === Error && err.message) {
+        // Plain Error thrown deliberately by a form's own checks.
+        setSubmitError(err.message);
+      } else {
+        setSubmitError('Something went wrong. Please try again.');
+      }
     }
   });
 

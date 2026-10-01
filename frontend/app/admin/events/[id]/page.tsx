@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/Button';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { FundraisingEventForm, type FundraisingEventFormValues } from '@/components/forms/FundraisingEventForm';
+import { FundraisingEventForm, type toEventPayload } from '@/components/forms/FundraisingEventForm';
 import { addEventSupplier, getEvent, listSuppliers, removeEventSupplier, updateEvent, updateEventSupplier } from '@/lib/adminApi';
-import type { EventSupplierStatus, FundraisingEvent, Supplier } from '@/lib/types';
+import { EVENT_COVER_LABELS, type EventSupplierStatus, type FundraisingEvent, type Supplier } from '@/lib/types';
 
 const SUPPLIER_STATUS_OPTIONS = [
   { value: 'possible', label: 'Possible' },
@@ -50,14 +50,8 @@ export default function EventDetailPage() {
     load();
   }, [load]);
 
-  const handleEditSubmit = async (values: FundraisingEventFormValues) => {
-    await updateEvent(id, {
-      event_date: values.event_date,
-      bunnings_store_id: values.bunnings_store_id,
-      charity_id: values.charity_id,
-      status: values.status,
-      notes: values.notes || null,
-    });
+  const handleEditSubmit = async (payload: ReturnType<typeof toEventPayload>) => {
+    await updateEvent(id, payload);
     setIsEditing(false);
     await load();
   };
@@ -142,6 +136,7 @@ export default function EventDetailPage() {
 
       <div className="mb-6 flex items-start justify-between">
         <div>
+          {event.event_name && <p className="mb-1 text-lg font-semibold text-navy">{event.event_name}</p>}
           <h1 className="mb-1">{formatEventDate(event.event_date)}</h1>
           <Badge tone={toneForStatus(event.status)}>{event.status}</Badge>
         </div>
@@ -189,6 +184,43 @@ export default function EventDetailPage() {
               <dt className="text-charcoal/60">Notes</dt>
               <dd className="whitespace-pre-wrap text-right">{event.notes || '—'}</dd>
             </div>
+          </dl>
+
+          <h2 className="mb-2 mt-6 text-sm font-semibold text-navy">Event details</h2>
+          <dl className="space-y-2 text-sm">
+            <DetailRow label="Event name" value={event.event_name} />
+            <DetailRow label="Location" value={event.cover_type ? EVENT_COVER_LABELS[event.cover_type] : null} />
+            <DetailRow label="Estimated hotdogs" value={event.estimated_hotdogs} />
+            <DetailRow label="Estimated staff" value={event.estimated_staff} />
+            <DetailRow label="Number of shifts" value={event.number_of_shifts} />
+          </dl>
+
+          <h2 className="mb-2 mt-6 text-sm font-semibold text-navy">Packages used</h2>
+          {event.event_packages.length === 0 ? (
+            <p className="text-sm text-charcoal/60">None recorded.</p>
+          ) : (
+            <ul className="space-y-1 text-sm">
+              {event.event_packages.map((p) => (
+                <li key={p.id} className="flex justify-between gap-4">
+                  <span>{p.packages?.name ?? 'Package'}</span>
+                  <span>× {p.quantity}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h2 className="mb-2 mt-6 text-sm font-semibold text-navy">Results</h2>
+          <dl className="space-y-2 text-sm">
+            <DetailRow label="Hotdogs sold" value={event.actual_hotdogs_sold} />
+            <DetailRow label="Number of sales" value={event.number_of_sales} />
+            <DetailRow
+              label="Value of sales"
+              value={
+                event.sales_value_aud != null
+                  ? Number(event.sales_value_aud).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })
+                  : null
+              }
+            />
           </dl>
         </Card>
       )}
@@ -297,5 +329,14 @@ export default function EventDetailPage() {
         )}
       </Card>
     </AdminLayout>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string | number | null | undefined }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <dt className="text-charcoal/60">{label}</dt>
+      <dd className="text-right">{value === null || value === undefined || value === '' ? '—' : value}</dd>
+    </div>
   );
 }

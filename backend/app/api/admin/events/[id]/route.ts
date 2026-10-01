@@ -1,6 +1,7 @@
 /**
  * GET   /api/admin/events/:id            event with Bunnings store, charity and supplier links
- * PATCH /api/admin/events/:id            update date, store, charity, status, notes; is_deleted=true removes it
+ * PATCH /api/admin/events/:id            update date, store, charity, status, notes, event details and
+ *                                        packages used (full list); is_deleted=true removes it
  */
 
 import { NextResponse } from 'next/server';
@@ -10,7 +11,7 @@ import { NotFoundError, ValidationError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges } from '@/lib/audit';
-import { EVENT_SELECT, EVENT_STATUSES } from '@/lib/events';
+import { EVENT_SELECT, EVENT_STATUSES, eventDetailFields, eventPackagesSchema, replaceEventPackages } from '@/lib/events';
 
 const updateEventSchema = z
   .object({
@@ -20,6 +21,8 @@ const updateEventSchema = z
     status: z.enum(EVENT_STATUSES),
     notes: z.string().max(5000).nullable(),
     is_deleted: z.boolean(),
+    ...eventDetailFields,
+    packages: eventPackagesSchema,
   })
   .partial();
 
@@ -78,10 +81,21 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (beforeError) throw beforeError;
     if (!before) throw new NotFoundError('Event not found');
 
-    const { error } = await supabase.from('events').update(parsed.data).eq('id', id);
-    if (error) {
-      if (error.code === '23503') throw new ValidationError('The chosen Bunnings store or charity does not exist');
-      throw error;
+    const { packages, ...eventFields } = parsed.data;
+    if (Object.keys(eventFields).length > 0) {
+      const { error } = await supabase.from('events').update(eventFields).eq('id', id);
+      if (error) {
+        if (error.code === '23503') throw new ValidationError('The chosen Bunnings store or charity does not exist');
+        throw error;
+      }
+    }
+    if (packages) {
+      try {
+        await replaceEventPackages(supabase, id, packages);
+      } catch (e) {
+        if ((e as { code?: string }).code === '23503') throw new ValidationError('One of the chosen packages does not exist');
+        throw e;
+      }
     }
     const { data, error: readError } = await supabase.from('events').select(EVENT_SELECT).eq('id', id).maybeSingle();
     if (readError) throw readError;
@@ -94,7 +108,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       description: `Updated event ${before.event_date} (${Object.keys(parsed.data).join(', ')})`,
       entityType: 'events',
       entityId: id,
-      changes: diffChanges(before, { ...before, ...parsed.data }),
+      changes: diffChanges(before, { ...before, ...eventFields }),
       requestParams: parsed.data,
       recordIds: [id],
       ipAddress,

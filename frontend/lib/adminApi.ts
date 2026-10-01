@@ -13,6 +13,7 @@ import type {
   BunningsStore,
   Charity,
   CustomerInteraction,
+  EventCoverType,
   EventStatus,
   EventSupplierLink,
   EventSupplierStatus,
@@ -289,6 +290,28 @@ export function getSupplier(id: string) {
   return api.get<{ data: Supplier }>(`/api/admin/suppliers/${id}`);
 }
 
+export type UpdateSupplierInput = Partial<
+  Pick<
+    Supplier,
+    | 'supplier_chain'
+    | 'source_store_id'
+    | 'store_name'
+    | 'address'
+    | 'suburb'
+    | 'state'
+    | 'postcode'
+    | 'phone'
+    | 'contact_name'
+    | 'contact_email'
+    | 'contact_mobile'
+    | 'is_active'
+  >
+>;
+
+export function updateSupplier(id: string, input: UpdateSupplierInput) {
+  return api.patch<{ data: Supplier }>(`/api/admin/suppliers/${id}`, input);
+}
+
 export function listSupplierChains() {
   return api.get<{ data: SupplierChain[] }>('/api/admin/supplier-chains');
 }
@@ -358,6 +381,16 @@ export interface CreateEventInput {
   charity_id: string;
   status?: EventStatus;
   notes?: string | null;
+  event_name?: string | null;
+  estimated_hotdogs?: number | null;
+  estimated_staff?: number | null;
+  number_of_shifts?: number | null;
+  cover_type?: EventCoverType | null;
+  actual_hotdogs_sold?: number | null;
+  number_of_sales?: number | null;
+  sales_value_aud?: number | null;
+  /** Full list of packages used; replaces any previously recorded list. */
+  packages?: { package_id: string; quantity: number }[];
 }
 
 export function createEvent(input: CreateEventInput) {
@@ -380,4 +413,27 @@ export function updateEventSupplier(eventId: string, linkId: string, input: { st
 
 export function removeEventSupplier(eventId: string, linkId: string) {
   return api.delete<{ data: { id: string } }>(`/api/admin/events/${eventId}/suppliers/${linkId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Packages (admin management; active packages are also public via landing-page-data)
+// ---------------------------------------------------------------------------
+
+export function listAdminPackages(includeInactive = true) {
+  return api.get<{ data: Package[] }>('/api/admin/packages', includeInactive ? { include_inactive: 'true' } : undefined);
+}
+
+export interface PackageInput {
+  name: string;
+  description?: string | null;
+  base_price_aud: number;
+  is_active?: boolean;
+}
+
+export function createPackage(input: PackageInput) {
+  return api.post<{ data: Package }>('/api/admin/packages', input);
+}
+
+export function updatePackage(id: string, input: Partial<PackageInput> & { is_deleted?: boolean }) {
+  return api.patch<{ data: Package }>(`/api/admin/packages/${id}`, input);
 }

@@ -96,6 +96,7 @@ export default function AdminEventsPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium text-navy">{formatEventDate(ev.event_date)}</p>
+                      {ev.event_name && <p className="text-sm font-medium text-charcoal">{ev.event_name}</p>}
                       <p className="text-sm text-charcoal/70">{ev.charities?.name ?? 'Charity'}</p>
                       <p className="text-sm text-charcoal/60">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
                       <p className="mt-1 text-xs text-charcoal/60">

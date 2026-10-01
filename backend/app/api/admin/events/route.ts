@@ -15,7 +15,7 @@ import { ValidationError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction } from '@/lib/audit';
-import { EVENT_SELECT, EVENT_STATUSES } from '@/lib/events';
+import { EVENT_SELECT, EVENT_STATUSES, eventDetailFields, eventPackagesSchema, replaceEventPackages } from '@/lib/events';
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD');
 
@@ -25,6 +25,8 @@ const createEventSchema = z.object({
   charity_id: z.string().uuid(),
   status: z.enum(EVENT_STATUSES).optional(),
   notes: z.string().max(5000).optional().nullable(),
+  ...z.object(eventDetailFields).partial().shape,
+  packages: eventPackagesSchema.optional(),
 });
 
 export async function GET(request: Request) {
@@ -97,12 +99,23 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseForRequest(request);
-    const { data, error } = await supabase.from('events').insert(parsed.data).select(EVENT_SELECT).single();
+    const { packages, ...eventFields } = parsed.data;
+    const { data: created, error } = await supabase.from('events').insert(eventFields).select('id').single();
     if (error) {
       // Foreign-key violation: the Bunnings store or charity does not exist.
       if (error.code === '23503') throw new ValidationError('The chosen Bunnings store or charity does not exist');
       throw error;
     }
+    if (packages) {
+      try {
+        await replaceEventPackages(supabase, created.id, packages);
+      } catch (e) {
+        if ((e as { code?: string }).code === '23503') throw new ValidationError('One of the chosen packages does not exist');
+        throw e;
+      }
+    }
+    const { data, error: readError } = await supabase.from('events').select(EVENT_SELECT).eq('id', created.id).single();
+    if (readError) throw readError;
 
     await logAdminAction({
       adminUserId,

@@ -3,20 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-import { FundraisingEventForm, type FundraisingEventFormValues } from '@/components/forms/FundraisingEventForm';
+import { FundraisingEventForm, type toEventPayload } from '@/components/forms/FundraisingEventForm';
 import { createEvent } from '@/lib/adminApi';
 
 export default function NewEventPage() {
   const router = useRouter();
 
-  const handleSubmit = async (values: FundraisingEventFormValues) => {
-    const { data } = await createEvent({
-      event_date: values.event_date,
-      bunnings_store_id: values.bunnings_store_id,
-      charity_id: values.charity_id,
-      status: values.status,
-      notes: values.notes || null,
-    });
+  const handleSubmit = async (payload: ReturnType<typeof toEventPayload>) => {
+    const { data } = await createEvent(payload);
     router.push(`/admin/events/${data.id}`);
   };
 
