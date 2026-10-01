@@ -26,7 +26,7 @@ npm run dev                  # runs on http://localhost:3001 (backend runs on :3
 
 ```
 /app
-  /admin        — authenticated (Rita & Natalie): dashboard, charities, orders, bunnings, woolworths, login
+  /admin        — authenticated (Rita & Natalie): dashboard, charities, orders, bunnings, suppliers, supplier-status, login
   /charity      — charity users: signup, my-events, profile
   /public       — landing, about
 /components
@@ -61,7 +61,7 @@ authority; middleware is a fast-fail convenience layer), documented in
 ## Status
 
 Scaffolding complete per Task 2.1: all routes listed in the brief exist as typed placeholder pages
-(admin dashboard shell, list-view placeholders for charities/orders/bunnings/woolworths, a working
+(admin dashboard shell, list-view placeholders for charities/orders/bunnings/suppliers, a working
 login page wired to the backend, and public/charity placeholder pages), all six "core components"
 (AuthContext/useAuth, Button/Card/Input/Select, FormWrapper, ProtectedRoute, AdminLayout, PublicLayout)
 are built, and the project builds cleanly (`next build` — 13 routes, zero type errors).
@@ -107,7 +107,7 @@ backend API (no more placeholders), plus the mobile-first responsive shell:
 
 - **Navigation**: `AdminNav` (desktop sidebar) is now hidden below the `md`
   breakpoint; a new `MobileNav` bottom tab bar (Home/Charities/Orders/
-  Bunnings/Woolworths, inline SVG icons, ≥44px touch targets) shows only on
+  Bunnings/Supplier, inline SVG icons, ≥44px touch targets) shows only on
   mobile. `AdminLayout` adds bottom padding so page content isn't hidden
   behind the fixed mobile nav.
 - **Dashboard Home** (`/admin/dashboard`) — real stats on load: total
@@ -129,10 +129,10 @@ backend API (no more placeholders), plus the mobile-first responsive shell:
   "Log a call" widget that appends a timestamped note to
   `interaction_notes` (see the backend README's Task 2.2 section for why
   this doesn't use `customer_interactions`).
-- **Woolworths** (`/admin/woolworths`) — was a static "not yet available"
+- **Supplier** (`/admin/supplier-status`) — was a static "not yet available"
   shell as of this section; that is now out of date. Since 2026-09-24 this
   is a working three-state page (loading / create form / status card +
-  edit) backed by the real `/api/admin/woolworths` endpoint — see the
+  edit) backed by the real `/api/admin/supplier-contact` endpoint — see the
   "Tasks 2.4, 3.1, 3.2 additions" section below.
 
 **A documented schema discrepancy**: the Task 2.2 brief describes the "Add
@@ -158,7 +158,7 @@ Full detail is in the Claude project docs — `claude/task-2-4-retail-partner-tr
 `claude/task-3-1-landing-and-signup.md`, `claude/task-3-2-bunnings-ao-portal.md`
 — this note is a pointer, not a duplicate.
 
-- **Woolworths** (`/admin/woolworths`) is now real — see the correction
+- **Supplier** (`/admin/supplier-status`) is now real — see the correction
   above.
 - **Public landing page** (`/public/landing`) — `Hero`, `HowItWorks`,
   `Benefits`, `Testimonial`, `PricingTiers`, `FAQ`, `CTAFooter` sections.

@@ -22,6 +22,7 @@ const createCharitySchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
+  postcode: z.string().regex(/^[0-9]{4}$/, 'Postcode must be 4 digits').optional().nullable(),
   contact_name: z.string().optional().nullable(),
   tax_id: z.string().optional().nullable(),
   bunnings_store_id: z.string().uuid().optional().nullable(),

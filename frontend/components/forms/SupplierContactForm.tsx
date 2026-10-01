@@ -6,9 +6,9 @@ import { FormWrapper } from './FormWrapper';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
-import type { WoolworthsContact } from '@/lib/types';
+import type { SupplierContact } from '@/lib/types';
 
-export const woolworthsFormSchema = z.object({
+export const supplierContactFormSchema = z.object({
   contact_person_name: z.string().min(2, 'Enter at least 2 characters').max(100),
   contact_email: z.string().email('Enter a valid email').or(z.literal('')).optional(),
   contact_phone: z.string().optional(),
@@ -23,11 +23,11 @@ export const woolworthsFormSchema = z.object({
   internal_notes: z.string().optional(),
 });
 
-export type WoolworthsFormValues = z.infer<typeof woolworthsFormSchema>;
+export type SupplierContactFormValues = z.infer<typeof supplierContactFormSchema>;
 
 const dateOnly = (value?: string | null) => (value ? value.slice(0, 10) : '');
 
-function contactToFormValues(contact?: Partial<WoolworthsContact>): WoolworthsFormValues {
+function contactToFormValues(contact?: Partial<SupplierContact>): SupplierContactFormValues {
   return {
     contact_person_name: contact?.contact_person_name ?? '',
     contact_email: contact?.contact_email ?? '',
@@ -47,11 +47,11 @@ function contactToFormValues(contact?: Partial<WoolworthsContact>): WoolworthsFo
 const textareaClass =
   'w-full rounded-card border border-grey px-3 py-2 text-sm text-charcoal placeholder:text-charcoal/40 focus-ring';
 
-function WoolworthsFields() {
+function SupplierContactFields() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<WoolworthsFormValues>();
+  } = useFormContext<SupplierContactFormValues>();
 
   return (
     <div className="space-y-4">
@@ -103,18 +103,18 @@ function WoolworthsFields() {
   );
 }
 
-export function WoolworthsForm({
+export function SupplierContactForm({
   defaultValues,
   onSubmit,
   submitLabel = 'Save',
 }: {
-  defaultValues?: Partial<WoolworthsContact>;
-  onSubmit: (values: WoolworthsFormValues) => Promise<void>;
+  defaultValues?: Partial<SupplierContact>;
+  onSubmit: (values: SupplierContactFormValues) => Promise<void>;
   submitLabel?: string;
 }) {
   return (
-    <FormWrapper schema={woolworthsFormSchema} defaultValues={contactToFormValues(defaultValues)} onSubmit={onSubmit}>
-      <WoolworthsFields />
+    <FormWrapper schema={supplierContactFormSchema} defaultValues={contactToFormValues(defaultValues)} onSubmit={onSubmit}>
+      <SupplierContactFields />
       <Button type="submit" className="mt-6 w-full">
         {submitLabel}
       </Button>

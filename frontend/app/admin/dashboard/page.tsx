@@ -103,7 +103,7 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Link href="/admin/charities">
           <Button variant="outline" className="w-full">
             View Charities
@@ -119,9 +119,14 @@ export default function AdminDashboardPage() {
             View Bunnings Stores
           </Button>
         </Link>
-        <Link href="/admin/woolworths">
+        <Link href="/admin/suppliers">
           <Button variant="outline" className="w-full">
-            Woolworths Status
+            View Suppliers
+          </Button>
+        </Link>
+        <Link href="/admin/supplier-status">
+          <Button variant="outline" className="w-full">
+            Supplier Status
           </Button>
         </Link>
       </div>

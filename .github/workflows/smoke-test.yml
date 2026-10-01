@@ -1,0 +1,32 @@
+name: Smoke test (staging or production)
+
+# Manual gate: run this against staging before promoting to production, and
+# again straight after the production deploy.
+on:
+  workflow_dispatch:
+    inputs:
+      frontend_url:
+        description: Frontend base URL (no trailing slash)
+        required: true
+        default: https://visionvelocity.com.au
+      backend_url:
+        description: Backend base URL (no trailing slash)
+        required: true
+        default: https://api.visionvelocity.com.au
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Frontend home page returns 200
+        run: curl -fsS -o /dev/null -w "%{http_code}\n" "${{ inputs.frontend_url }}/"
+      - name: Public landing data returns 200
+        run: curl -fsS -o /dev/null -w "%{http_code}\n" "${{ inputs.backend_url }}/api/public/landing-page-data"
+      - name: Admin API refuses unauthenticated requests (expects 401)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "${{ inputs.backend_url }}/api/admin/charities")
+          echo "status $code"; test "$code" = "401"

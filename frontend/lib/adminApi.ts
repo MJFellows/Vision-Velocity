@@ -13,6 +13,10 @@ import type {
   BunningsStore,
   Charity,
   CustomerInteraction,
+  EventStatus,
+  EventSupplierLink,
+  EventSupplierStatus,
+  FundraisingEvent,
   InteractionDirection,
   InteractionOutcome,
   InteractionType,
@@ -20,7 +24,12 @@ import type {
   OrderStatus,
   Package,
   PaginatedResponse,
-  WoolworthsContact,
+  SamePostcodeBunnings,
+  SamePostcodeCharity,
+  SamePostcodeSupplier,
+  Supplier,
+  SupplierChain,
+  SupplierContact,
 } from './types';
 
 // ---------------------------------------------------------------------------
@@ -49,7 +58,7 @@ export function getCharity(id: string, includeAudit = false) {
 }
 
 export type CreateCharityInput = Pick<Charity, 'name'> &
-  Partial<Pick<Charity, 'email' | 'phone' | 'location' | 'contact_name' | 'tax_id' | 'bunnings_store_id' | 'internal_notes' | 'tags'>>;
+  Partial<Pick<Charity, 'email' | 'phone' | 'location' | 'postcode' | 'contact_name' | 'tax_id' | 'bunnings_store_id' | 'internal_notes' | 'tags'>>;
 
 export function createCharity(input: CreateCharityInput) {
   return api.post<{ data: Charity }>('/api/admin/charities', input);
@@ -128,8 +137,25 @@ export function updateOrder(id: string, input: UpdateOrderInput) {
 // Bunnings stores
 // ---------------------------------------------------------------------------
 
-export function listBunningsStores(activeOnly = true) {
-  return api.get<{ data: BunningsStore[] }>('/api/admin/bunnings', { active: activeOnly ? 'true' : 'false' });
+export interface LocationFilters {
+  state?: string;
+  postcode?: string; // 4 digits or wildcard pattern such as 42*
+  search?: string;
+}
+
+export interface BunningsFilters extends LocationFilters {
+  source?: 'manual' | 'import';
+}
+
+function definedParams<T extends object>(params: T): Record<string, string> {
+  return Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== '')) as Record<string, string>;
+}
+
+export function listBunningsStores(activeOnly = true, filters: BunningsFilters = {}) {
+  return api.get<{ data: BunningsStore[] }>('/api/admin/bunnings', {
+    active: activeOnly ? 'true' : 'false',
+    ...definedParams(filters),
+  });
 }
 
 export function getBunningsStore(id: string, includeAudit = false) {
@@ -209,17 +235,18 @@ export function listActivePackages() {
 }
 
 // ---------------------------------------------------------------------------
-// Woolworths negotiation contact (singleton — see backend route comment)
+// Supplier negotiation contact (one record per supplier chain — see backend route comment)
 // ---------------------------------------------------------------------------
 
-export function getWoolworthsContact() {
-  return api.get<{ data: WoolworthsContact | null }>('/api/admin/woolworths');
+export function getSupplierContact(supplierChain = 'Woolworths') {
+  return api.get<{ data: SupplierContact | null }>('/api/admin/supplier-contact', { supplier_chain: supplierChain });
 }
 
-export type CreateWoolworthsContactInput = Pick<WoolworthsContact, 'contact_person_name'> &
+export type CreateSupplierContactInput = Pick<SupplierContact, 'contact_person_name'> &
   Partial<
     Pick<
-      WoolworthsContact,
+      SupplierContact,
+      | 'supplier_chain'
       | 'contact_email'
       | 'contact_phone'
       | 'contact_role'
@@ -234,12 +261,123 @@ export type CreateWoolworthsContactInput = Pick<WoolworthsContact, 'contact_pers
     >
   >;
 
-export function createWoolworthsContact(input: CreateWoolworthsContactInput) {
-  return api.post<{ data: WoolworthsContact }>('/api/admin/woolworths', input);
+export function createSupplierContact(input: CreateSupplierContactInput) {
+  return api.post<{ data: SupplierContact }>('/api/admin/supplier-contact', input);
 }
 
-export type UpdateWoolworthsContactInput = Partial<CreateWoolworthsContactInput>;
+export type UpdateSupplierContactInput = Partial<CreateSupplierContactInput>;
 
-export function updateWoolworthsContact(input: UpdateWoolworthsContactInput) {
-  return api.patch<{ data: WoolworthsContact }>('/api/admin/woolworths', input);
+export function updateSupplierContact(supplierChain: string, input: Omit<UpdateSupplierContactInput, 'supplier_chain'>) {
+  return api.patch<{ data: SupplierContact }>(`/api/admin/supplier-contact?supplier_chain=${encodeURIComponent(supplierChain)}`, input);
+}
+
+// ---------------------------------------------------------------------------
+// Suppliers (store locations for Woolworths, Coles, IGA, ...)
+// ---------------------------------------------------------------------------
+
+export interface ListSuppliersParams extends LocationFilters {
+  supplier_chain?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export function listSuppliers(params: ListSuppliersParams = {}) {
+  return api.get<PaginatedResponse<Supplier>>('/api/admin/suppliers', definedParams(params));
+}
+
+export function getSupplier(id: string) {
+  return api.get<{ data: Supplier }>(`/api/admin/suppliers/${id}`);
+}
+
+export function listSupplierChains() {
+  return api.get<{ data: SupplierChain[] }>('/api/admin/supplier-chains');
+}
+
+// ---------------------------------------------------------------------------
+// Same-postcode lookups (exact four-digit match)
+// ---------------------------------------------------------------------------
+
+/** 0 = same postcode only; otherwise also include records within this many kilometres. */
+export type NearbyRadiusKm = 0 | 5 | 10 | 25 | 50;
+
+export const NEARBY_RADIUS_OPTIONS: { value: NearbyRadiusKm; label: string }[] = [
+  { value: 0, label: 'Same postcode only' },
+  { value: 5, label: 'Within 5 km' },
+  { value: 10, label: 'Within 10 km' },
+  { value: 25, label: 'Within 25 km' },
+  { value: 50, label: 'Within 50 km' },
+];
+
+interface SamePostcodeMeta {
+  postcode: string | null;
+  radius_km: number | null;
+  /** null in exact mode; false when nearby matching was requested but the postcode can not be placed. */
+  origin_available: boolean | null;
+}
+
+export function getBunningsSamePostcode<T extends 'suppliers' | 'charities'>(id: string, include: T, radiusKm: NearbyRadiusKm = 0) {
+  type Row = T extends 'suppliers' ? SamePostcodeSupplier : SamePostcodeCharity;
+  return api.get<SamePostcodeMeta & { data: Row[] }>(`/api/admin/bunnings/${id}/same-postcode`, {
+    include,
+    ...(radiusKm ? { radius_km: radiusKm } : {}),
+  });
+}
+
+export function getCharitySamePostcode(id: string, radiusKm: NearbyRadiusKm = 0) {
+  return api.get<SamePostcodeMeta & { data: { suppliers: SamePostcodeSupplier[]; bunnings_stores: SamePostcodeBunnings[] } }>(
+    `/api/admin/charities/${id}/same-postcode`,
+    radiusKm ? { radius_km: radiusKm } : undefined
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Events (date + Bunnings store + charity; supplier stores linked with a per-event status)
+// ---------------------------------------------------------------------------
+
+export interface ListEventsParams {
+  status?: EventStatus;
+  charity_id?: string;
+  bunnings_store_id?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export function listEvents(params: ListEventsParams = {}) {
+  return api.get<PaginatedResponse<FundraisingEvent>>('/api/admin/events', definedParams(params));
+}
+
+export function getEvent(id: string) {
+  return api.get<{ data: FundraisingEvent }>(`/api/admin/events/${id}`);
+}
+
+export interface CreateEventInput {
+  event_date: string;
+  bunnings_store_id: string;
+  charity_id: string;
+  status?: EventStatus;
+  notes?: string | null;
+}
+
+export function createEvent(input: CreateEventInput) {
+  return api.post<{ data: FundraisingEvent }>('/api/admin/events', input);
+}
+
+export type UpdateEventInput = Partial<CreateEventInput> & { is_deleted?: boolean };
+
+export function updateEvent(id: string, input: UpdateEventInput) {
+  return api.patch<{ data: FundraisingEvent }>(`/api/admin/events/${id}`, input);
+}
+
+export function addEventSupplier(eventId: string, input: { supplier_id: string; status?: EventSupplierStatus; notes?: string | null }) {
+  return api.post<{ data: EventSupplierLink }>(`/api/admin/events/${eventId}/suppliers`, input);
+}
+
+export function updateEventSupplier(eventId: string, linkId: string, input: { status?: EventSupplierStatus; notes?: string | null }) {
+  return api.patch<{ data: EventSupplierLink }>(`/api/admin/events/${eventId}/suppliers/${linkId}`, input);
+}
+
+export function removeEventSupplier(eventId: string, linkId: string) {
+  return api.delete<{ data: { id: string } }>(`/api/admin/events/${eventId}/suppliers/${linkId}`);
 }

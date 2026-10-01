@@ -24,6 +24,7 @@ export function toneForStatus(status: string): BadgeTone {
     case 'active':
     case 'confirmed':
     case 'delivered':
+    case 'completed':
     case 'agreed':
     case 'order_placed':
     case 'issue_resolved':
@@ -31,6 +32,8 @@ export function toneForStatus(status: string): BadgeTone {
     case 'trial':
     case 'pending':
     case 'scheduled':
+    case 'planned':
+    case 'possible':
     case 'interested':
     case 'meeting_scheduled':
     case 'follow_up_needed':
@@ -38,6 +41,7 @@ export function toneForStatus(status: string): BadgeTone {
     case 'inactive':
     case 'cancelled':
     case 'rejected':
+    case 'declined':
     case 'error':
       return 'danger';
     default:
