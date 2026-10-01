@@ -56,11 +56,24 @@ export async function POST(request: Request) {
       throw new ValidationError('Invalid or expired recovery token. Please request a new password reset.');
     }
 
-    // Now update the password using the session from the recovery token
-    const { error: updateError } = await supabase.auth.updateUser(
-      { password },
-      { headers: { Authorization: `Bearer ${verifyData.session.access_token}` } }
+    // Create an authenticated client using the session token
+    const authenticatedSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${verifyData.session.access_token}`,
+          },
+        },
+        auth: { autoRefreshToken: false, persistSession: false },
+      }
     );
+
+    // Update the password using the authenticated client
+    const { error: updateError } = await authenticatedSupabase.auth.updateUser({
+      password,
+    });
 
     if (updateError) {
       throw new ValidationError(updateError.message || 'Failed to reset password');
