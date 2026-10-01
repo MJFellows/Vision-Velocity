@@ -64,6 +64,11 @@ export default function AdminLoginPage() {
             Sign in
           </Button>
         </FormWrapper>
+        <div className="mt-4 text-center text-sm">
+          <a href="/admin/forgot-password" className="text-accent hover:underline">
+            Forgot password?
+          </a>
+        </div>
       </Card>
     </div>
   );

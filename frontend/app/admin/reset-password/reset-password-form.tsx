@@ -1,5 +1,5 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -19,6 +19,7 @@ import { api, ApiRequestError } from '@/lib/api';
  */
 export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const tokenHash = searchParams.get('token_hash');
   const code = searchParams.get('code');
   const type = searchParams.get('type');
@@ -86,7 +87,7 @@ export default function ResetPasswordForm() {
       await api.post('/api/auth/reset-password', body, true /* skipAuth: public endpoint */);
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = '/admin/login';
+        router.push('/admin/login');
       }, 2500);
     } catch (err) {
       if (err instanceof ApiRequestError) {
