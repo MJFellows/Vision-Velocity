@@ -1,6 +1,6 @@
 /**
  * POST /api/auth/reset-password
- * Body: { code: string, newPassword: string }
+ * Body: { code: string, password: string }
  *
  * Handles password reset using Supabase's recovery token from password reset emails.
  * The recovery token comes from the email link with type=recovery&code=<token>.
@@ -9,12 +9,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { ValidationError, BadRequestError, handleApiError } from '@/utils/errors';
+import { ValidationError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 
 const resetPasswordSchema = z.object({
   code: z.string().min(1, 'Recovery code is required'),
-  newPassword: z
+  password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { code, newPassword } = parsed.data;
+    const { code, password } = parsed.data;
 
     // Create a Supabase client without a session
     const supabase = createClient(
@@ -53,17 +53,17 @@ export async function POST(request: Request) {
     });
 
     if (verifyError || !verifyData.session) {
-      throw new BadRequestError('Invalid or expired recovery token. Please request a new password reset.');
+      throw new ValidationError('Invalid or expired recovery token. Please request a new password reset.');
     }
 
     // Now update the password using the session from the recovery token
     const { error: updateError } = await supabase.auth.updateUser(
-      { password: newPassword },
+      { password },
       { headers: { Authorization: `Bearer ${verifyData.session.access_token}` } }
     );
 
     if (updateError) {
-      throw new BadRequestError(updateError.message || 'Failed to reset password');
+      throw new ValidationError(updateError.message || 'Failed to reset password');
     }
 
     return NextResponse.json(
