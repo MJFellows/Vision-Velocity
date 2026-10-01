@@ -13,6 +13,7 @@ import { ValidationError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 
 const resetPasswordSchema = z.object({
+  email: z.string().email('Valid email required'),
   code: z.string().min(1, 'Recovery code is required'),
   password: z
     .string()
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { code, password } = parsed.data;
+    const { email, code, password } = parsed.data;
 
     // Create a Supabase client without a session
     const supabase = createClient(
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
 
     // First, verify the recovery code by exchanging it for a session
     const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-      email: '', // Recovery tokens don't require email
+      email: email,
       token: code,
       type: 'recovery',
     });

@@ -12,6 +12,7 @@ export default function ResetPasswordForm() {
   const type = searchParams.get('type');
   
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +83,7 @@ export default function ResetPasswordForm() {
     try {
       await api.post(
         '/api/auth/reset-password',
-        { code, password },
+        { email, code, password },
         true // skipAuth: true because this endpoint is public
       );
       setSuccess(true);
@@ -129,6 +130,16 @@ export default function ResetPasswordForm() {
               {error}
             </div>
           )}
+
+          <Input
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            disabled={loading}
+            required
+          />
 
           <Input
             label="New Password"
