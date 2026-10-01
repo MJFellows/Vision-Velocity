@@ -1,7 +1,8 @@
 /**
  * PATCH /api/admin/packages/:id   update name, description, base price, active flag;
  *                                 is_deleted=true removes it (packages already used
- *                                 on events stay linked to those events).
+ *                                 on events stay linked to those events). `components`
+ *                                 (full list of { component_id, quantity }) replaces the contents.
  */
 
 import { NextResponse } from 'next/server';
@@ -12,8 +13,11 @@ import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges } from '@/lib/audit';
 import { PACKAGE_COLUMNS, packageFields } from '@/lib/packages';
+import { packageComponentsSchema, replacePackageComponents } from '@/lib/components';
 
-const updatePackageSchema = z.object({ ...packageFields, is_deleted: z.boolean() }).partial();
+const updatePackageSchema = z
+  .object({ ...packageFields, is_deleted: z.boolean(), components: packageComponentsSchema })
+  .partial();
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -48,11 +52,24 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (beforeError) throw beforeError;
     if (!before) throw new NotFoundError('Package not found');
 
-    const { data, error } = await supabase.from('packages').update(parsed.data).eq('id', id).select(PACKAGE_COLUMNS).single();
-    if (error) {
-      if (error.code === '23505') throw new ConflictError('A package with that name already exists');
-      throw error;
+    const { components, ...packageUpdate } = parsed.data;
+    if (Object.keys(packageUpdate).length > 0) {
+      const { error } = await supabase.from('packages').update(packageUpdate).eq('id', id);
+      if (error) {
+        if (error.code === '23505') throw new ConflictError('A package with that name already exists');
+        throw error;
+      }
     }
+    if (components) {
+      try {
+        await replacePackageComponents(supabase, id, components);
+      } catch (e) {
+        if ((e as { code?: string }).code === '23503') throw new ValidationError('One of the chosen components does not exist');
+        throw e;
+      }
+    }
+    const { data, error } = await supabase.from('packages').select(PACKAGE_COLUMNS).eq('id', id).single();
+    if (error) throw error;
     await logAdminAction({
       adminUserId,
       userEmail: adminEmail,

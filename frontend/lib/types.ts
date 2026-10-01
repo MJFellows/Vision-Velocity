@@ -110,6 +110,44 @@ export interface Package {
   created_at: string;
   updated_at: string;
   is_deleted: boolean;
+  /** Present on admin package reads (GET /api/admin/packages). */
+  package_components?: PackageComponentLink[];
+}
+
+export type ComponentStorage = 'shelf' | 'refrigerated' | 'frozen';
+
+export const COMPONENT_STORAGE_LABELS: Record<ComponentStorage, string> = {
+  shelf: 'Shelf',
+  refrigerated: 'Refrigerated',
+  frozen: 'Frozen',
+};
+
+/** An item or ingredient that goes into packages (sausages, bread, sauce, napkins ...). */
+export interface Component {
+  id: string;
+  name: string;
+  pack_size: string | null;
+  quantity: number | null;
+  unit: string | null;
+  size_litres: number | null;
+  storage: ComponentStorage | null;
+  packaging_material: string | null;
+  target_buy_cost_aud: number | null;
+  target_sell_price_aud: number | null;
+  comments: string | null;
+  image_path: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface PackageComponentLink {
+  id: string;
+  component_id: string;
+  quantity: number;
+  components: Pick<Component, 'id' | 'name' | 'quantity' | 'unit' | 'target_buy_cost_aud' | 'target_sell_price_aud' | 'is_active'> | null;
 }
 
 export interface Order {

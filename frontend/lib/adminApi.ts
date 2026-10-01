@@ -12,6 +12,7 @@ import type {
   AuditLogEntry,
   BunningsStore,
   Charity,
+  Component,
   CustomerInteraction,
   EventCoverType,
   EventStatus,
@@ -434,6 +435,58 @@ export function createPackage(input: PackageInput) {
   return api.post<{ data: Package }>('/api/admin/packages', input);
 }
 
-export function updatePackage(id: string, input: Partial<PackageInput> & { is_deleted?: boolean }) {
+export function updatePackage(
+  id: string,
+  input: Partial<PackageInput> & { is_deleted?: boolean; components?: { component_id: string; quantity: number }[] }
+) {
   return api.patch<{ data: Package }>(`/api/admin/packages/${id}`, input);
+}
+
+// ---------------------------------------------------------------------------
+// Components (items/ingredients in packages) and their units
+// ---------------------------------------------------------------------------
+
+export function listComponents(includeInactive = true, search?: string) {
+  return api.get<{ data: Component[] }>('/api/admin/components', {
+    include_inactive: includeInactive ? 'true' : undefined,
+    search: search || undefined,
+  });
+}
+
+export type ComponentInput = Partial<
+  Pick<
+    Component,
+    | 'pack_size'
+    | 'quantity'
+    | 'unit'
+    | 'size_litres'
+    | 'storage'
+    | 'packaging_material'
+    | 'target_buy_cost_aud'
+    | 'target_sell_price_aud'
+    | 'comments'
+    | 'is_active'
+  >
+> & { name: string };
+
+export function createComponent(input: ComponentInput) {
+  return api.post<{ data: Component }>('/api/admin/components', input);
+}
+
+export function updateComponent(id: string, input: Partial<ComponentInput> & { is_deleted?: boolean }) {
+  return api.patch<{ data: Component }>(`/api/admin/components/${id}`, input);
+}
+
+export function uploadComponentImage(id: string, file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  return api.postForm<{ data: Component }>(`/api/admin/components/${id}/image`, form);
+}
+
+export function removeComponentImage(id: string) {
+  return api.delete<{ data: Component }>(`/api/admin/components/${id}/image`);
+}
+
+export function listComponentUnits() {
+  return api.get<{ data: { name: string; display_order: number }[] }>('/api/admin/component-units');
 }

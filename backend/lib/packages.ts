@@ -2,7 +2,8 @@
 
 import { z } from 'zod';
 
-export const PACKAGE_COLUMNS = 'id, name, description, base_price_aud, items, is_active, created_at, updated_at, is_deleted';
+export const PACKAGE_COLUMNS =
+  'id, name, description, base_price_aud, items, is_active, created_at, updated_at, is_deleted, package_components(id, component_id, quantity, components(id, name, quantity, unit, target_buy_cost_aud, target_sell_price_aud, is_active))';
 
 export const packageFields = {
   name: z.string().trim().min(1, 'Name is required').max(120),

@@ -159,7 +159,24 @@ async function request<T>(path: string, options: RequestOptions = {}, isRetry = 
   return payload as T;
 }
 
+/** POST multipart/form-data (file uploads). Same auth and error handling as `request`, without the JSON body. */
+async function postForm<T>(path: string, form: FormData, isRetry = false): Promise<T> {
+  const headers: Record<string, string> = {};
+  const token = getStoredToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await fetch(buildUrl(path), { method: 'POST', headers, body: form });
+  const isJson = response.headers.get('content-type')?.includes('application/json');
+  const payload = isJson ? await response.json() : undefined;
+  if (!response.ok) {
+    if (response.status === 401 && !isRetry && (await refreshSession())) return postForm<T>(path, form, true);
+    if (response.status === 401) setStoredToken(null);
+    throw new ApiRequestError(response.status, (payload ?? { error: { message: 'Upload failed', code: 'UPLOAD_FAILED' } }) as ApiErrorBody);
+  }
+  return payload as T;
+}
+
 export const api = {
+  postForm,
   get: <T>(path: string, query?: RequestOptions['query'], skipAuth = false) =>
     request<T>(path, { method: 'GET', query, skipAuth }),
   post: <T>(path: string, body?: unknown, skipAuth = false) =>
