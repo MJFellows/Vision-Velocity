@@ -33,8 +33,8 @@ export default async function SignupSuccessPage({
               <h2 className="mb-4 text-lg font-semibold text-navy">What happens next</h2>
               <ol className="space-y-3 text-sm text-charcoal/70">
                 <li className="flex"><span className="mr-3 font-bold text-accent">1.</span><span>Our team reviews your application (typically within 24 hours)</span></li>
-                <li className="flex"><span className="mr-3 font-bold text-accent">2.</span><span>We&apos;ll send you a confirmation email with access to your dashboard</span></li>
-                <li className="flex"><span className="mr-3 font-bold text-accent">3.</span><span>Log in and book your first event at your chosen Bunnings location</span></li>
+                <li className="flex"><span className="mr-3 font-bold text-accent">2.</span><span>We&apos;ll email you to confirm your application has been approved</span></li>
+                <li className="flex"><span className="mr-3 font-bold text-accent">3.</span><span>Reply with your preferred date and Bunnings location, and we&apos;ll book your first event</span></li>
                 <li className="flex"><span className="mr-3 font-bold text-accent">4.</span><span>We&apos;ll handle setup and delivery — you focus on fundraising</span></li>
               </ol>
             </div>
