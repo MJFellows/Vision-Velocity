@@ -1,4 +1,4 @@
-import { forwardRef, type SelectHTMLAttributes } from 'react';
+import { forwardRef, useId, type SelectHTMLAttributes } from 'react';
 import clsx from 'clsx';
 
 export interface SelectOption {
@@ -15,7 +15,10 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, placeholder, id, className, ...rest }, ref) => {
-    const selectId = id || rest.name;
+    // Always link the label; a select with no visible label is named from its placeholder or first option.
+    const autoId = useId();
+    const selectId = id || rest.name || autoId;
+    const fallbackName = !label && !rest['aria-label'] && !rest['aria-labelledby'] ? placeholder || options[0]?.label || 'Choose an option' : undefined;
 
     return (
       <div className="w-full">
@@ -33,6 +36,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className
           )}
           aria-invalid={Boolean(error)}
+          aria-label={fallbackName}
           {...rest}
         >
           {placeholder && (
