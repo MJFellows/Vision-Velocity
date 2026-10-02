@@ -83,7 +83,7 @@ export default function AdminSupplierStatusPage() {
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      {contact === undefined && !error && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {contact === undefined && !error && <p className="text-sm text-charcoal/70">Loading…</p>}
 
       {contact === null && (
         <Card className="max-w-lg">

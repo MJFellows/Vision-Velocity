@@ -246,7 +246,7 @@ function ImageControl({ component, onChanged }: { component: Component; onChange
         // eslint-disable-next-line @next/next/no-img-element
         <img src={component.image_url} alt={component.name} className="h-32 w-32 rounded-card border border-grey object-cover" />
       ) : (
-        <div className="flex h-32 w-32 items-center justify-center rounded-card border border-dashed border-grey text-xs text-charcoal/50">
+        <div className="flex h-32 w-32 items-center justify-center rounded-card border border-dashed border-grey text-xs text-charcoal/70">
           No image
         </div>
       )}
@@ -264,7 +264,7 @@ function ImageControl({ component, onChanged }: { component: Component; onChange
         />
       </label>
       {component.image_url && !busy && (
-        <button type="button" className="text-sm text-charcoal/60 underline" onClick={remove}>
+        <button type="button" className="text-sm text-charcoal/70 underline" onClick={remove}>
           Remove image
         </button>
       )}
@@ -300,7 +300,7 @@ export default function ComponentsPage() {
   return (
     <AdminLayout>
       <h1 className="mb-1">Components</h1>
-      <p className="mb-6 text-sm text-charcoal/60">Items and ingredients that make up packages. Add them to a package on the Packages page.</p>
+      <p className="mb-6 text-sm text-charcoal/70">Items and ingredients that make up packages. Add them to a package on the Packages page.</p>
       {message && <p className="mb-4 text-sm text-green-700">{message}</p>}
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -309,8 +309,8 @@ export default function ComponentsPage() {
             <CardTitle>All components</CardTitle>
           </CardHeader>
           {loadError && <p className="text-sm text-red-600">{loadError}</p>}
-          {!components && !loadError && <p className="text-sm text-charcoal/60">Loading…</p>}
-          {components && components.length === 0 && <p className="text-sm text-charcoal/60">No components yet — add the first one.</p>}
+          {!components && !loadError && <p className="text-sm text-charcoal/70">Loading…</p>}
+          {components && components.length === 0 && <p className="text-sm text-charcoal/70">No components yet — add the first one.</p>}
           <ul className="divide-y divide-grey">
             {components?.map((c) => (
               <li key={c.id} className="py-4">
@@ -355,7 +355,7 @@ export default function ComponentsPage() {
                       <p className="text-charcoal/70">
                         Buy {fmtMoney(c.target_buy_cost_aud)} · Sell {fmtMoney(c.target_sell_price_aud)}
                       </p>
-                      {c.comments && <p className="mt-1 whitespace-pre-wrap text-charcoal/60">{c.comments}</p>}
+                      {c.comments && <p className="mt-1 whitespace-pre-wrap text-charcoal/70">{c.comments}</p>}
                     </div>
                     <Button
                       variant="outline"

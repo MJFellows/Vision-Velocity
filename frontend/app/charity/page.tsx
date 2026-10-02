@@ -32,7 +32,7 @@ function Home() {
   return (
     <>
       <h1 className="mb-1">Hello{firstName ? ` ${firstName}` : ''}</h1>
-      <p className="mb-6 text-sm text-charcoal/60">Here is where things stand for {me.charity.name}.</p>
+      <p className="mb-6 text-sm text-charcoal/70">Here is where things stand for {me.charity.name}.</p>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -40,7 +40,7 @@ function Home() {
             <CardTitle>Your next event</CardTitle>
           </CardHeader>
           {events === null ? (
-            <p className="text-sm text-charcoal/60">Loading…</p>
+            <p className="text-sm text-charcoal/70">Loading…</p>
           ) : next ? (
             <Link href={`/charity/my-events/${next.id}`} className="block">
               <p className="font-medium text-navy">{next.event_name || 'Sausage sizzle'}</p>
@@ -60,7 +60,7 @@ function Home() {
           <CardHeader>
             <CardTitle>Waiting for you</CardTitle>
           </CardHeader>
-          {events === null && <p className="text-sm text-charcoal/60">Loading…</p>}
+          {events === null && <p className="text-sm text-charcoal/70">Loading…</p>}
           {events !== null && needResults.length === 0 && requested.length === 0 && <p className="text-sm text-green-700">Nothing is waiting for you right now.</p>}
           {needResults.length > 0 && (
             <div className="mb-4">

@@ -161,7 +161,7 @@ function ContentsEditor({
       <p className="text-sm font-semibold text-navy">Contents of {pkg.name}</p>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {available.length === 0 && (
-        <p className="text-sm text-charcoal/60">
+        <p className="text-sm text-charcoal/70">
           No components yet.{' '}
           <a className="text-accent underline" href="/admin/components">
             Add components
@@ -194,7 +194,7 @@ function ContentsEditor({
           />
           <button
             type="button"
-            className="text-sm text-charcoal/60 underline"
+            className="text-sm text-charcoal/70 underline"
             onClick={() => setRows(rows.filter((_, j) => j !== i))}
           >
             Remove
@@ -261,8 +261,8 @@ export default function PackagesPage() {
             <CardTitle>All packages</CardTitle>
           </CardHeader>
           {loadError && <p className="text-sm text-red-600">{loadError}</p>}
-          {!packages && !loadError && <p className="text-sm text-charcoal/60">Loading…</p>}
-          {packages && packages.length === 0 && <p className="text-sm text-charcoal/60">No packages yet — add the first one.</p>}
+          {!packages && !loadError && <p className="text-sm text-charcoal/70">Loading…</p>}
+          {packages && packages.length === 0 && <p className="text-sm text-charcoal/70">No packages yet — add the first one.</p>}
           <ul className="divide-y divide-grey">
             {packages?.map((p) => (
               <li key={p.id} className="py-3">
@@ -306,7 +306,7 @@ export default function PackagesPage() {
                           {(() => {
                             const r = rollUp(p);
                             return (
-                              <p className="mt-1 text-xs text-charcoal/60">
+                              <p className="mt-1 text-xs text-charcoal/70">
                                 Target cost {money(r.cost)} · target sell value {money(r.sell)}
                                 {r.missing > 0 && ` (${r.missing} component${r.missing === 1 ? '' : 's'} without prices)`}
                               </p>
@@ -314,7 +314,7 @@ export default function PackagesPage() {
                           })()}
                         </>
                       ) : (
-                        <p className="mt-1 text-xs text-charcoal/50">No contents recorded.</p>
+                        <p className="mt-1 text-xs text-charcoal/70">No contents recorded.</p>
                       )}
                     </div>
                     <div className="flex flex-col gap-2">

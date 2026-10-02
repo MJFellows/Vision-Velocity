@@ -86,12 +86,12 @@ export default function AdminSuppliersPage() {
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      <p className="mb-3 text-sm text-charcoal/60" aria-live="polite">
+      <p className="mb-3 text-sm text-charcoal/70" aria-live="polite">
         {isLoading ? 'Loading…' : `${total.toLocaleString('en-AU')} supplier${total === 1 ? '' : 's'}`}
       </p>
 
       {!isLoading && suppliers.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No suppliers match these filters.</p>
+        <p className="text-sm text-charcoal/70">No suppliers match these filters.</p>
       ) : (
         <div className="space-y-3">
           {suppliers.map((s) => (
@@ -100,10 +100,10 @@ export default function AdminSuppliersPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-navy">{s.store_name}</p>
-                    <p className="text-sm text-charcoal/60">
+                    <p className="text-sm text-charcoal/70">
                       {[s.address, s.suburb].filter(Boolean).join(', ')} {s.state} {s.postcode}
                     </p>
-                    <p className="text-sm text-charcoal/60">
+                    <p className="text-sm text-charcoal/70">
                       {s.phone || 'No phone on file'}
                       {s.opening_hours ? ` · Today: ${formatDay(s.opening_hours[todayKey])}` : ''}
                     </p>
@@ -121,7 +121,7 @@ export default function AdminSuppliersPage() {
           <Button variant="outline" disabled={page <= 1 || isLoading} onClick={() => setPage((p) => p - 1)}>
             Previous
           </Button>
-          <span className="text-sm text-charcoal/60">
+          <span className="text-sm text-charcoal/70">
             Page {page} of {totalPages}
           </span>
           <Button variant="outline" disabled={page >= totalPages || isLoading} onClick={() => setPage((p) => p + 1)}>

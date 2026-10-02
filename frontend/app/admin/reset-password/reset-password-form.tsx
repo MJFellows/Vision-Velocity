@@ -171,7 +171,7 @@ export default function ResetPasswordForm() {
             required
           />
 
-          <p className="text-xs text-charcoal/60">
+          <p className="text-xs text-charcoal/70">
             At least 8 characters, including an uppercase letter and a number. Each reset link
             works once; if it fails, request a new email and use the newest link.
           </p>
@@ -186,7 +186,7 @@ export default function ResetPasswordForm() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-grey text-center text-sm text-charcoal/60">
+        <div className="mt-6 pt-4 border-t border-grey text-center text-sm text-charcoal/70">
           Remember your password?{' '}
           <a href="/admin/login" className="text-accent hover:underline">
             Back to Login

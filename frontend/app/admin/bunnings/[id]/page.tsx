@@ -182,7 +182,7 @@ export default function BunningsStoreDetailPage() {
   if (!store) {
     return (
       <AdminLayout>
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       </AdminLayout>
     );
   }
@@ -234,23 +234,23 @@ export default function BunningsStoreDetailPage() {
         <Card className="mb-6 max-w-lg">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Address</dt>
+              <dt className="text-charcoal/70">Address</dt>
               <dd className="text-right">{store.store_address || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Store phone</dt>
+              <dt className="text-charcoal/70">Store phone</dt>
               <dd>{store.store_phone || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Activities Officer</dt>
+              <dt className="text-charcoal/70">Activities Officer</dt>
               <dd>{store.activities_officer_name || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">AO email</dt>
+              <dt className="text-charcoal/70">AO email</dt>
               <dd>{store.activities_officer_email || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">AO phone</dt>
+              <dt className="text-charcoal/70">AO phone</dt>
               <dd>{store.activities_officer_phone || '—'}</dd>
             </div>
           </dl>
@@ -263,27 +263,27 @@ export default function BunningsStoreDetailPage() {
         </CardHeader>
         <dl className="mb-4 space-y-2 text-sm">
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Bunnings store ID</dt>
+            <dt className="text-charcoal/70">Bunnings store ID</dt>
             <dd>{store.bunnings_store_id || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Suburb, state, postcode</dt>
+            <dt className="text-charcoal/70">Suburb, state, postcode</dt>
             <dd className="text-right">{[store.suburb, store.state, store.postcode].filter(Boolean).join(' ') || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Store email</dt>
+            <dt className="text-charcoal/70">Store email</dt>
             <dd>{store.store_email ? <a className="text-navy underline" href={`mailto:${store.store_email}`}>{store.store_email}</a> : '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Fax</dt>
+            <dt className="text-charcoal/70">Fax</dt>
             <dd>{store.store_fax || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Store map</dt>
+            <dt className="text-charcoal/70">Store map</dt>
             <dd>{store.map_url ? <a className="text-navy underline" href={store.map_url} target="_blank" rel="noopener noreferrer">Open store map</a> : '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Coordinates</dt>
+            <dt className="text-charcoal/70">Coordinates</dt>
             <dd>
               {store.latitude != null && store.longitude != null ? (
                 <a className="text-navy underline" href={`https://www.google.com/maps?q=${store.latitude},${store.longitude}`} target="_blank" rel="noopener noreferrer">
@@ -295,7 +295,7 @@ export default function BunningsStoreDetailPage() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Record source</dt>
+            <dt className="text-charcoal/70">Record source</dt>
             <dd>{store.source === 'import' ? 'National directory import' : 'Entered by the team'}</dd>
           </div>
         </dl>
@@ -311,7 +311,7 @@ export default function BunningsStoreDetailPage() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-charcoal/60">No services recorded.</p>
+          <p className="text-sm text-charcoal/70">No services recorded.</p>
         )}
       </Card>
 
@@ -348,7 +348,7 @@ export default function BunningsStoreDetailPage() {
             Show link to copy
           </Button>
         </div>
-        {!store.activities_officer_email && <p className="mt-2 text-xs text-charcoal/60">Add the Activities Officer&apos;s email above first.</p>}
+        {!store.activities_officer_email && <p className="mt-2 text-xs text-charcoal/70">Add the Activities Officer&apos;s email above first.</p>}
         {magicLink && (
           <div className="mt-4 rounded-card bg-grey/50 p-3 text-sm">
             {magicLink.emailed && <p className="mb-1 text-green-700">Emailed to {magicLink.activitiesOfficerEmail}.</p>}

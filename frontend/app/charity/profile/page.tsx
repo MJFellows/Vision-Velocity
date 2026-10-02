@@ -98,7 +98,7 @@ function Details() {
         <Button type="submit" isLoading={busy}>
           Save changes
         </Button>
-        <p className="text-xs text-charcoal/60">Changing the contact email here does not change the email you sign in with.</p>
+        <p className="text-xs text-charcoal/70">Changing the contact email here does not change the email you sign in with.</p>
       </form>
     </Card>
   );
@@ -163,16 +163,16 @@ function People() {
       <CardHeader>
         <CardTitle>People who can sign in</CardTitle>
       </CardHeader>
-      {people === null && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {people === null && <p className="text-sm text-charcoal/70">Loading…</p>}
       <ul className="mb-3 divide-y divide-grey text-sm">
         {people?.map((p) => (
           <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
             <div>
               <p className="font-medium text-navy">
                 {p.name || p.email} {p.role === 'owner' && <Badge tone="info">Main contact</Badge>} {!p.is_active && <Badge tone="danger">Switched off</Badge>}
-                {p.id === myId && <span className="ml-1 text-xs text-charcoal/50">(you)</span>}
+                {p.id === myId && <span className="ml-1 text-xs text-charcoal/70">(you)</span>}
               </p>
-              <p className="text-xs text-charcoal/60">{p.email}</p>
+              <p className="text-xs text-charcoal/70">{p.email}</p>
             </div>
             {isOwner && p.id !== myId && (
               <button type="button" className="text-xs text-charcoal/70 underline" onClick={() => toggle(p)}>
@@ -204,7 +204,7 @@ function People() {
           </Button>
         )
       ) : (
-        <p className="text-xs text-charcoal/60">Your charity&apos;s main contact can add or remove people.</p>
+        <p className="text-xs text-charcoal/70">Your charity&apos;s main contact can add or remove people.</p>
       )}
     </Card>
   );

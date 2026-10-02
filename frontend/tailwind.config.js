@@ -16,9 +16,11 @@ const config = {
           700: '#0B1F3B',
           900: '#071627',
         },
+        // Darkened from #FF381F on 2026-10-02 (Mark) so text and buttons meet
+        // WCAG 2.1 AA contrast: 5.4:1 on white, 4.6:1 on the grey background.
         accent: {
-          DEFAULT: '#FF381F',
-          hover: '#E22E17',
+          DEFAULT: '#CC2812',
+          hover: '#B02210',
         },
         grey: {
           DEFAULT: '#E9EDF2',

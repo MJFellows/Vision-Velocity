@@ -66,12 +66,12 @@ export default function AdminBunningsPage() {
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      <p className="mb-3 text-sm text-charcoal/60" aria-live="polite">
+      <p className="mb-3 text-sm text-charcoal/70" aria-live="polite">
         {isLoading ? 'Loading…' : `${stores.length.toLocaleString('en-AU')} store${stores.length === 1 ? '' : 's'}`}
       </p>
 
       {!isLoading && stores.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No Bunnings stores match these filters.</p>
+        <p className="text-sm text-charcoal/70">No Bunnings stores match these filters.</p>
       ) : (
         <div className="space-y-3">
           {stores.map((store) => (
@@ -80,10 +80,10 @@ export default function AdminBunningsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-navy">{store.location}</p>
-                    <p className="text-sm text-charcoal/60">
+                    <p className="text-sm text-charcoal/70">
                       {[store.suburb, store.state, store.postcode].filter(Boolean).join(' ') || 'Location not recorded'}
                     </p>
-                    <p className="text-sm text-charcoal/60">
+                    <p className="text-sm text-charcoal/70">
                       {store.activities_officer_name || 'No Activities Officer on file'}
                       {store.activities_officer_phone ? ` — ${store.activities_officer_phone}` : ''}
                     </p>

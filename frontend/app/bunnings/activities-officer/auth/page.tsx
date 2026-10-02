@@ -62,7 +62,7 @@ function AuthInner() {
 
 export default function BunningsAuthPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-charcoal/60">Opening…</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-charcoal/70">Opening…</div>}>
       <AuthInner />
     </Suspense>
   );

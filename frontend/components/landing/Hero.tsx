@@ -30,7 +30,7 @@ export function Hero() {
         </div>
         <div className="flex h-64 items-center justify-center overflow-hidden rounded-card bg-gradient-to-br from-grey/60 to-grey/20 shadow-sm sm:h-96">
           <div className="text-center">
-            <p className="text-lg text-charcoal/50">People fundraising with a sausage sizzle</p>
+            <p className="text-lg text-charcoal/70">People fundraising with a sausage sizzle</p>
             <p className="mt-2 text-sm text-charcoal/40">[Hero image placeholder]</p>
           </div>
         </div>

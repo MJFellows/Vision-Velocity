@@ -20,7 +20,7 @@ export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity' |
   return (
     <>
       <h1 className="mb-1">Help</h1>
-      <p className="mb-6 text-sm text-charcoal/60">Short, step-by-step guides. Press ? on any page for help with that page.</p>
+      <p className="mb-6 text-sm text-charcoal/70">Short, step-by-step guides. Press ? on any page for help with that page.</p>
       <input
         type="search"
         value={q}
@@ -32,7 +32,7 @@ export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity' |
       />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-3 lg:col-span-2">
-          {guides.length === 0 && <p className="text-sm text-charcoal/60">No guide matches “{q}”. Try other words, or use Feedback to ask us.</p>}
+          {guides.length === 0 && <p className="text-sm text-charcoal/70">No guide matches “{q}”. Try other words, or use Feedback to ask us.</p>}
           {guides.map((g) => (
             <Link key={g.slug} href={`${base}/${g.slug}`} className="block rounded-card border border-grey bg-white p-4 hover:border-accent">
               <p className="font-medium text-navy">{g.title}</p>

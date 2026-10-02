@@ -34,7 +34,7 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/admin/lo
 
   if (isLoading || !isAuthenticated || (user && !user.role)) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-charcoal/60">
+      <div className="flex min-h-screen items-center justify-center text-charcoal/70">
         <p>Checking your session…</p>
       </div>
     );

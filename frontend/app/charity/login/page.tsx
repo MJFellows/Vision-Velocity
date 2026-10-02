@@ -76,7 +76,7 @@ function CharityLogin() {
             Forgot password?
           </button>
         </div>
-        <p className="mt-4 text-center text-xs text-charcoal/60">
+        <p className="mt-4 text-center text-xs text-charcoal/70">
           Not signed up yet?{' '}
           <Link href="/charity/signup" className="text-accent underline">
             Register your charity

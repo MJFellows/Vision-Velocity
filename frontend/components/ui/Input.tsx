@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes } from 'react';
+import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 import clsx from 'clsx';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,7 +9,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, id, className, ...rest }, ref) => {
-    const inputId = id || rest.name;
+    // Every input gets an id so its label is always linked (screen readers, tapping the label).
+    const autoId = useId();
+    const inputId = id || rest.name || autoId;
 
     return (
       <div className="w-full">
@@ -35,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         )}
-        {!error && helperText && <p className="mt-1 text-sm text-charcoal/60">{helperText}</p>}
+        {!error && helperText && <p className="mt-1 text-sm text-charcoal/70">{helperText}</p>}
       </div>
     );
   }

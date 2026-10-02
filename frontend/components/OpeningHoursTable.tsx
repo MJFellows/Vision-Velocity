@@ -33,11 +33,11 @@ export function OpeningHoursTable({ hours, raw }: { hours: OpeningHours | null; 
   if (!hours) {
     return raw ? (
       <div>
-        <p className="mb-1 text-xs text-charcoal/60">Hours could not be structured — original text from source:</p>
+        <p className="mb-1 text-xs text-charcoal/70">Hours could not be structured — original text from source:</p>
         <p className="whitespace-pre-wrap text-sm text-charcoal">{raw}</p>
       </div>
     ) : (
-      <p className="text-sm text-charcoal/60">Opening hours not recorded.</p>
+      <p className="text-sm text-charcoal/70">Opening hours not recorded.</p>
     );
   }
   return (
@@ -45,7 +45,7 @@ export function OpeningHoursTable({ hours, raw }: { hours: OpeningHours | null; 
       <tbody>
         {DAYS.map(({ key, label }) => (
           <tr key={key} className="border-b border-grey last:border-0">
-            <th scope="row" className="py-1 pr-4 text-left font-normal text-charcoal/60">
+            <th scope="row" className="py-1 pr-4 text-left font-normal text-charcoal/70">
               {label}
             </th>
             <td className="py-1 text-right text-charcoal">{formatDay(hours[key])}</td>

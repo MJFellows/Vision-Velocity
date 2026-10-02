@@ -20,7 +20,7 @@ function Orders() {
     <>
       <h1 className="mb-6">My orders</h1>
       {error && <p className="text-sm text-red-600">Could not load your orders — please refresh.</p>}
-      {orders === null && !error && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {orders === null && !error && <p className="text-sm text-charcoal/70">Loading…</p>}
       {orders && orders.length === 0 && <p className="text-sm text-charcoal/70">No orders yet. Vision Velocity records an order once your event and package are agreed.</p>}
       <div className="space-y-2">
         {orders?.map((o) => (

@@ -46,7 +46,7 @@ function MyEvents() {
         </Link>
       </div>
       {error && <p className="text-sm text-red-600">Could not load your events — please refresh.</p>}
-      {events === null && !error && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {events === null && !error && <p className="text-sm text-charcoal/70">Loading…</p>}
       {events && events.length === 0 && (
         <p className="text-sm text-charcoal/70">
           You have no events yet. Press <strong>Request an event</strong> to ask for your first sausage sizzle.

@@ -26,7 +26,7 @@ export function EventChecklist({ event }: { event: FundraisingEvent }) {
     <Card className="mb-6 max-w-2xl">
       <CardHeader>
         <CardTitle>
-          Checklist <span className="ml-2 text-sm font-normal text-charcoal/60">{done} of {items.length} done</span>
+          Checklist <span className="ml-2 text-sm font-normal text-charcoal/70">{done} of {items.length} done</span>
         </CardTitle>
       </CardHeader>
       <ul className="space-y-1.5 text-sm">
@@ -37,7 +37,7 @@ export function EventChecklist({ event }: { event: FundraisingEvent }) {
             </span>
             <span className={i.done ? 'text-charcoal' : 'text-charcoal/80'}>
               {i.label}
-              {!i.done && i.hint && <span className="ml-1 text-xs text-charcoal/50">— {i.hint}</span>}
+              {!i.done && i.hint && <span className="ml-1 text-xs text-charcoal/70">— {i.hint}</span>}
             </span>
             <span className="sr-only">{i.done ? 'done' : 'not done'}</span>
           </li>

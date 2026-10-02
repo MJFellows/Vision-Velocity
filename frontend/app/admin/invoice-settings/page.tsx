@@ -148,7 +148,7 @@ export default function InvoiceSettingsPage() {
               </label>
               <textarea id="footer_note" rows={2} value={s.footer_note ?? ''} onChange={(e) => set('footer_note', e.target.value)} className="w-full rounded-card border border-grey px-3 py-2 text-sm focus-ring" />
             </div>
-            <p className="text-xs text-charcoal/60">
+            <p className="text-xs text-charcoal/70">
               GST registered: {s.gst_registered ? 'yes' : 'no'}. If Vision Velocity registers for GST, invoices will need to become tax invoices — ask for the
               invoice layout to be updated first.
             </p>
@@ -158,7 +158,7 @@ export default function InvoiceSettingsPage() {
               Save settings
             </Button>
             {s.updated_by_email && (
-              <p className="text-xs text-charcoal/50">
+              <p className="text-xs text-charcoal/70">
                 Last changed {new Date(s.updated_at).toLocaleString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })} by{' '}
                 {s.updated_by_email}
               </p>

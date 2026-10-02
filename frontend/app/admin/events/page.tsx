@@ -95,12 +95,12 @@ export default function AdminEventsPage() {
       </div>
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-      <p className="mb-3 text-sm text-charcoal/60" aria-live="polite">
+      <p className="mb-3 text-sm text-charcoal/70" aria-live="polite">
         {isLoading ? 'Loading…' : `${total} event${total === 1 ? '' : 's'}`}
       </p>
 
       {!isLoading && events.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No events match these filters. Events are the sausage sizzles themselves — <Link href="/admin/events/new" className="text-accent underline">add one</Link>, or clear the filters.</p>
+        <p className="text-sm text-charcoal/70">No events match these filters. Events are the sausage sizzles themselves — <Link href="/admin/events/new" className="text-accent underline">add one</Link>, or clear the filters.</p>
       ) : (
         <div className="space-y-3">
           {events.map((ev) => {
@@ -115,8 +115,8 @@ export default function AdminEventsPage() {
                       <p className="font-medium text-navy">{formatEventDate(ev.event_date)}</p>
                       {ev.event_name && <p className="text-sm font-medium text-charcoal">{ev.event_name}</p>}
                       <p className="text-sm text-charcoal/70">{ev.charities?.name ?? 'Charity'}</p>
-                      <p className="text-sm text-charcoal/60">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
-                      <p className="mt-1 text-xs text-charcoal/60">
+                      <p className="text-sm text-charcoal/70">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
+                      <p className="mt-1 text-xs text-charcoal/70">
                         Suppliers: {confirmed} confirmed · {possible} possible · {declined} declined
                       </p>
                     </div>
@@ -134,7 +134,7 @@ export default function AdminEventsPage() {
           <Button variant="outline" disabled={page <= 1 || isLoading} onClick={() => setPage((p) => p - 1)}>
             Previous
           </Button>
-          <span className="text-sm text-charcoal/60">
+          <span className="text-sm text-charcoal/70">
             Page {page} of {totalPages}
           </span>
           <Button variant="outline" disabled={page >= totalPages || isLoading} onClick={() => setPage((p) => p + 1)}>

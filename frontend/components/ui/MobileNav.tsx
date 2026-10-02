@@ -50,7 +50,7 @@ export function MobileNav() {
           const active = pathname?.startsWith(href);
           const Icon = href === '/admin/dashboard' ? HomeIcon : href === '/admin/events' ? CalendarIcon : UsersIcon;
           return (
-            <Link key={href} href={href} className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', active ? 'text-accent' : 'text-charcoal/60')}>
+            <Link key={href} href={href} className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', active ? 'text-accent' : 'text-charcoal/70')}>
               <Icon className="h-6 w-6" />
               {LABELS[href]}
             </Link>
@@ -60,7 +60,7 @@ export function MobileNav() {
           type="button"
           onClick={() => setMoreOpen((v) => !v)}
           aria-expanded={moreOpen}
-          className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', inMore || moreOpen ? 'text-accent' : 'text-charcoal/60')}
+          className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', inMore || moreOpen ? 'text-accent' : 'text-charcoal/70')}
         >
           <MoreIcon className="h-6 w-6" />
           More

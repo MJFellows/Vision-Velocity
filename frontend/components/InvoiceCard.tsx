@@ -84,7 +84,7 @@ export function InvoiceCard({ orderId, reloadKey = 0 }: { orderId: string; reloa
         <CardHeader>
           <CardTitle>Invoice</CardTitle>
         </CardHeader>
-        <p className="text-sm text-charcoal/60">{error ?? 'Loading…'}</p>
+        <p className="text-sm text-charcoal/70">{error ?? 'Loading…'}</p>
       </Card>
     );
   }
@@ -141,7 +141,7 @@ export function InvoiceCard({ orderId, reloadKey = 0 }: { orderId: string; reloa
                   Why is this invoice being cancelled? (shown on the voided invoice)
                 </label>
                 <input id="void-reason" value={reason} onChange={(e) => setReason(e.target.value)} className="mb-2 w-full rounded-card border border-grey px-3 py-2 text-sm focus-ring" />
-                <p className="mb-2 text-xs text-charcoal/60">Void it to correct a mistake, then press Issue invoice to create a corrected one with a new number.</p>
+                <p className="mb-2 text-xs text-charcoal/70">Void it to correct a mistake, then press Issue invoice to create a corrected one with a new number.</p>
                 <Button
                   type="button"
                   variant="outline"

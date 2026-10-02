@@ -168,7 +168,7 @@ export default function CharityDetailPage() {
   if (!charity) {
     return (
       <AdminLayout>
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       </AdminLayout>
     );
   }
@@ -248,27 +248,27 @@ export default function CharityDetailPage() {
         <Card className="mb-6 max-w-lg">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Contact</dt>
+              <dt className="text-charcoal/70">Contact</dt>
               <dd>{charity.contact_name || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Email</dt>
+              <dt className="text-charcoal/70">Email</dt>
               <dd>{charity.email || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Phone</dt>
+              <dt className="text-charcoal/70">Phone</dt>
               <dd>{charity.phone || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Location</dt>
+              <dt className="text-charcoal/70">Location</dt>
               <dd>{charity.location || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">Postcode</dt>
+              <dt className="text-charcoal/70">Postcode</dt>
               <dd>{charity.postcode || '—'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-charcoal/60">ABN / tax ID</dt>
+              <dt className="text-charcoal/70">ABN / tax ID</dt>
               <dd>{charity.tax_id || '—'}</dd>
             </div>
           </dl>
@@ -295,9 +295,9 @@ export default function CharityDetailPage() {
                   Add an event
                 </Link>
                 {events === null ? (
-                  <p className="text-sm text-charcoal/60">Loading…</p>
+                  <p className="text-sm text-charcoal/70">Loading…</p>
                 ) : events.length === 0 ? (
-                  <p className="text-sm text-charcoal/60">No events for this charity yet.</p>
+                  <p className="text-sm text-charcoal/70">No events for this charity yet.</p>
                 ) : (
                   events.map((ev) => (
                     <Link key={ev.id} href={`/admin/events/${ev.id}`}>
@@ -306,8 +306,8 @@ export default function CharityDetailPage() {
                           <p className="font-medium text-navy">
                             {new Date(`${ev.event_date}T00:00:00`).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                           </p>
-                          <p className="text-sm text-charcoal/60">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
-                          <p className="text-xs text-charcoal/60">
+                          <p className="text-sm text-charcoal/70">{ev.bunnings_stores?.location ?? 'Bunnings store'}</p>
+                          <p className="text-xs text-charcoal/70">
                             Suppliers: {ev.event_suppliers.filter((x) => x.status === 'confirmed').length} confirmed ·{' '}
                             {ev.event_suppliers.filter((x) => x.status === 'possible').length} possible ·{' '}
                             {ev.event_suppliers.filter((x) => x.status === 'declined').length} declined
@@ -327,16 +327,16 @@ export default function CharityDetailPage() {
             content: (
               <div className="space-y-3">
                 {orders === null ? (
-                  <p className="text-sm text-charcoal/60">Loading…</p>
+                  <p className="text-sm text-charcoal/70">Loading…</p>
                 ) : orders.length === 0 ? (
-                  <p className="text-sm text-charcoal/60">No orders for this charity yet.</p>
+                  <p className="text-sm text-charcoal/70">No orders for this charity yet.</p>
                 ) : (
                   orders.map((order) => (
                     <Link key={order.id} href={`/admin/orders/${order.id}`}>
                       <Card className="flex items-center justify-between hover:border-accent">
                         <div>
                           <p className="font-medium text-navy">{order.packages?.name ?? 'Package'}</p>
-                          <p className="text-sm text-charcoal/60">{order.event_date}</p>
+                          <p className="text-sm text-charcoal/70">{order.event_date}</p>
                         </div>
                         <Badge tone={toneForStatus(order.status)}>{order.status}</Badge>
                       </Card>
@@ -360,7 +360,7 @@ export default function CharityDetailPage() {
 
                 <div className="space-y-3">
                   {charity.recent_interactions.length === 0 ? (
-                    <p className="text-sm text-charcoal/60">No interactions logged yet.</p>
+                    <p className="text-sm text-charcoal/70">No interactions logged yet.</p>
                   ) : (
                     charity.recent_interactions.map((interaction) => (
                       <Card key={interaction.id}>
@@ -368,7 +368,7 @@ export default function CharityDetailPage() {
                           <span className="text-sm font-medium capitalize text-navy">
                             {interaction.interaction_type.replace('_', ' ')} — {interaction.direction}
                           </span>
-                          <span className="text-xs text-charcoal/50">
+                          <span className="text-xs text-charcoal/70">
                             {new Date(interaction.created_at).toLocaleDateString('en-AU')}
                           </span>
                         </div>

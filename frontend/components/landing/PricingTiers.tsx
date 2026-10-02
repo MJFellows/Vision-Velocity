@@ -60,10 +60,10 @@ export function PricingTiers() {
               )}
               <div className={`p-6 sm:p-8 ${pkg.highlighted ? 'bg-white' : ''}`}>
                 <h3 className="mb-2 text-xl font-bold text-navy sm:text-2xl">{pkg.name}</h3>
-                <p className="mb-4 text-sm text-charcoal/60">{pkg.description}</p>
+                <p className="mb-4 text-sm text-charcoal/70">{pkg.description}</p>
                 <div className="mb-6">
                   <span className="text-3xl font-bold text-navy sm:text-4xl">{pkg.price}</span>
-                  <span className="text-sm text-charcoal/60"> per event</span>
+                  <span className="text-sm text-charcoal/70"> per event</span>
                 </div>
                 <ul className="mb-8 space-y-3">
                   {pkg.features.map((feature) => (

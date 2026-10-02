@@ -47,13 +47,13 @@ export function FirstVisitTour({ area, steps }: { area: 'admin' | 'charity'; ste
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
       <div role="dialog" aria-label="Welcome tour" className="w-full max-w-md rounded-card bg-white p-6 shadow-xl">
-        <p className="mb-1 text-xs font-semibold uppercase text-charcoal/50">
+        <p className="mb-1 text-xs font-semibold uppercase text-charcoal/70">
           Welcome tour · {step + 1} of {steps.length}
         </p>
         <h2 className="mb-2 text-lg font-semibold text-navy">{s.title}</h2>
         <p className="mb-6 text-sm text-charcoal/80">{s.body}</p>
         <div className="flex items-center justify-between gap-3">
-          <button type="button" className="text-sm text-charcoal/60 underline" onClick={finish}>
+          <button type="button" className="text-sm text-charcoal/70 underline" onClick={finish}>
             Skip tour
           </button>
           <div className="flex gap-2">

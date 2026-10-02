@@ -79,7 +79,7 @@ function EventCard({ e, store, past }: { e: AoEvent; store: string; past?: boole
           </div>
         )}
       </dl>
-      {!past && (
+      {(
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="outline" isLoading={busy === 'print'} onClick={() => sheet('print')} data-track="Print run sheet">
             Print run sheet
@@ -87,7 +87,7 @@ function EventCard({ e, store, past }: { e: AoEvent; store: string; past?: boole
           <Button type="button" variant="outline" isLoading={busy === 'download'} onClick={() => sheet('download')} data-track="Download run sheet">
             Download PDF
           </Button>
-          <Button
+          {!past && <Button
             type="button"
             variant="outline"
             data-track="Add to calendar"
@@ -102,7 +102,7 @@ function EventCard({ e, store, past }: { e: AoEvent; store: string; past?: boole
             }
           >
             Add to calendar
-          </Button>
+          </Button>}
         </div>
       )}
       {error && (

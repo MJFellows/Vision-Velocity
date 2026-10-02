@@ -43,7 +43,7 @@ export default async function CharitySignupPage() {
           </p>
         </div>
 
-        <Suspense fallback={<div className="text-center text-charcoal/60">Loading…</div>}>
+        <Suspense fallback={<div className="text-center text-charcoal/70">Loading…</div>}>
           <SignupForm bunningsStores={bunningsStores} />
         </Suspense>
       </div>

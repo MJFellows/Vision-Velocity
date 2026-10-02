@@ -18,7 +18,7 @@ import { aud, longDate, todayIso } from '@/lib/dates';
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="text-charcoal/60">{label}</dt>
+      <dt className="text-charcoal/70">{label}</dt>
       <dd className="text-right">{value === null || value === undefined || value === '' ? '—' : value}</dd>
     </div>
   );
@@ -88,7 +88,7 @@ function EventDetail() {
   }, [load]);
 
   if (error) return <p className="text-sm text-red-600">{error}</p>;
-  if (!event) return <p className="text-sm text-charcoal/60">Loading…</p>;
+  if (!event) return <p className="text-sm text-charcoal/70">Loading…</p>;
 
   const canEnterResults = event.event_date <= todayIso() && !['requested', 'cancelled'].includes(event.status);
   const s = event.bunnings_stores;
@@ -134,7 +134,7 @@ function EventDetail() {
               <Row label="Hotdogs sold" value={event.actual_hotdogs_sold} />
               <Row label="Number of sales" value={event.number_of_sales} />
               <Row label="Value of sales" value={event.sales_value_aud != null ? aud(event.sales_value_aud) : null} />
-              <p className="pt-2 text-xs text-charcoal/60">You can enter results from the day of the event.</p>
+              <p className="pt-2 text-xs text-charcoal/70">You can enter results from the day of the event.</p>
             </dl>
           )}
         </Card>

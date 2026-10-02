@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
   return (
     <AdminLayout>
       <h1 className="mb-1">Hi {firstName}, what would you like to do?</h1>
-      <p className="mb-6 text-sm text-charcoal/60">Here&apos;s where things stand today.</p>
+      <p className="mb-6 text-sm text-charcoal/70">Here&apos;s where things stand today.</p>
 
       <TodayPanel />
 

@@ -73,7 +73,7 @@ export default function InvoicesPage() {
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="mb-1">Invoices</h1>
-          <p className="text-sm text-charcoal/60">Issued automatically when an order is confirmed, or from the order page.</p>
+          <p className="text-sm text-charcoal/70">Issued automatically when an order is confirmed, or from the order page.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/admin/invoice-settings">
@@ -107,7 +107,7 @@ export default function InvoicesPage() {
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {!rows && !error && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {!rows && !error && <p className="text-sm text-charcoal/70">Loading…</p>}
       {rows && rows.length === 0 && (
         <Card>
           <p className="text-sm text-charcoal/70">

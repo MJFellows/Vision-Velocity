@@ -98,7 +98,7 @@ function RequestEvent() {
           <Button type="submit" className="w-full" isLoading={busy}>
             Send request
           </Button>
-          <p className="text-xs text-charcoal/60">Nothing is booked yet: Vision Velocity will confirm the date with you and with Bunnings.</p>
+          <p className="text-xs text-charcoal/70">Nothing is booked yet: Vision Velocity will confirm the date with you and with Bunnings.</p>
         </form>
       </Card>
     </>

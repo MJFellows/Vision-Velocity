@@ -323,7 +323,7 @@ export async function buildResultsSummaryPdf(e: EventDoc): Promise<Uint8Array> {
     pdf.row('Number of sales', e.number_of_sales, true);
     pdf.row('Value of sales', money(e.sales_value_aud), true);
     if (e.estimated_hotdogs && e.actual_hotdogs_sold != null) {
-      pdf.row('Hotdogs sold against estimate', `${e.actual_hotdogs_sold} of ${e.estimated_hotdogs} (${Math.round((e.actual_hotdogs_sold / e.estimated_hotdogs) * 100)}%)`);
+      pdf.row('Against estimate', `${e.actual_hotdogs_sold} of ${e.estimated_hotdogs} (${Math.round((e.actual_hotdogs_sold / e.estimated_hotdogs) * 100)}%)`);
     }
     if (e.sales_value_aud != null && e.number_of_sales) {
       pdf.row('Average sale', money(Number(e.sales_value_aud) / e.number_of_sales));

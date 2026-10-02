@@ -76,7 +76,7 @@ function OrderFields({ charities, packages, loadError }: { charities: Charity[];
     <div className="space-y-4">
       {loadError && <p className="text-sm text-red-600">{loadError}</p>}
       {packages.length === 0 && !loadError && (
-        <p className="text-sm text-charcoal/60">
+        <p className="text-sm text-charcoal/70">
           No active packages yet —{' '}
           <a href="/admin/packages" className="text-accent underline">
             add one on the Packages page

@@ -67,8 +67,8 @@ export function GlobalSearch({ onNavigate }: { onNavigate?: () => void }) {
       />
       {showResults && (
         <div className="absolute left-0 right-0 z-40 mt-1 max-h-96 overflow-y-auto rounded-card border border-grey bg-white shadow-lg">
-          {loading && <p className="px-4 py-3 text-sm text-charcoal/60">Searching…</p>}
-          {!loading && hits!.length === 0 && <p className="px-4 py-3 text-sm text-charcoal/60">Nothing found for “{q.trim()}”.</p>}
+          {loading && <p className="px-4 py-3 text-sm text-charcoal/70">Searching…</p>}
+          {!loading && hits!.length === 0 && <p className="px-4 py-3 text-sm text-charcoal/70">Nothing found for “{q.trim()}”.</p>}
           {!loading &&
             hits!.map((h) => (
               <Link
@@ -83,9 +83,9 @@ export function GlobalSearch({ onNavigate }: { onNavigate?: () => void }) {
                 }}
                 className="block border-b border-grey/60 px-4 py-2 last:border-0 hover:bg-grey/30"
               >
-                <span className="mr-2 text-xs font-semibold uppercase text-charcoal/50">{h.kind}</span>
+                <span className="mr-2 text-xs font-semibold uppercase text-charcoal/70">{h.kind}</span>
                 <span className="text-sm font-medium text-navy">{h.label}</span>
-                {h.detail && <span className="block text-xs text-charcoal/60">{h.detail}</span>}
+                {h.detail && <span className="block text-xs text-charcoal/70">{h.detail}</span>}
               </Link>
             ))}
         </div>

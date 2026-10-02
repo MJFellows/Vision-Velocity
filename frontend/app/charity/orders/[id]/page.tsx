@@ -16,7 +16,7 @@ import { ApiRequestError } from '@/lib/api';
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="text-charcoal/60">{label}</dt>
+      <dt className="text-charcoal/70">{label}</dt>
       <dd className="text-right">{value || '—'}</dd>
     </div>
   );
@@ -58,7 +58,7 @@ function InvoiceBox({ orderId, invoice }: { orderId: string; invoice: NonNullabl
         </Button>
       </div>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      <p className="mt-3 text-xs text-charcoal/60">Payment details are on the invoice. Vision Velocity is not registered for GST, so no GST is charged.</p>
+      <p className="mt-3 text-xs text-charcoal/70">Payment details are on the invoice. Vision Velocity is not registered for GST, so no GST is charged.</p>
     </Card>
   );
 }
@@ -75,7 +75,7 @@ function OrderDetail() {
   }, [id]);
 
   if (error) return <p className="text-sm text-red-600">Could not load this order.</p>;
-  if (!order) return <p className="text-sm text-charcoal/60">Loading…</p>;
+  if (!order) return <p className="text-sm text-charcoal/70">Loading…</p>;
 
   return (
     <>
@@ -99,7 +99,7 @@ function OrderDetail() {
           <Row label="Delivery phone" value={order.delivery_phone} />
           <Row label="Special requests" value={order.special_requests} />
         </dl>
-        <p className="mt-3 text-xs text-charcoal/60">This is an order summary. {order.invoice ? 'Your invoice is below.' : 'Your invoice is emailed when the order is confirmed.'}</p>
+        <p className="mt-3 text-xs text-charcoal/70">This is an order summary. {order.invoice ? 'Your invoice is below.' : 'Your invoice is emailed when the order is confirmed.'}</p>
       </Card>
       {order.invoice && <InvoiceBox orderId={order.id} invoice={order.invoice} />}
       <RecordActions

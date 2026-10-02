@@ -9,11 +9,11 @@ export function Testimonial() {
           </p>
           <div className="border-t border-grey pt-6">
             <p className="font-semibold text-navy">Sarah Thompson</p>
-            <p className="text-sm text-charcoal/60">Local Youth Sports Club</p>
-            <p className="text-sm text-charcoal/60">Raised $3,500 in one weekend</p>
+            <p className="text-sm text-charcoal/70">Local Youth Sports Club</p>
+            <p className="text-sm text-charcoal/70">Raised $3,500 in one weekend</p>
           </div>
         </div>
-        <p className="mt-6 text-center text-xs text-charcoal/50 sm:text-sm">
+        <p className="mt-6 text-center text-xs text-charcoal/70 sm:text-sm">
           *Testimonial from the Vision Velocity pilot program. Real customer results will be showcased here.
         </p>
       </div>

@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
   if (!order) {
     return (
       <AdminLayout>
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       </AdminLayout>
     );
   }
@@ -147,31 +147,31 @@ export default function OrderDetailPage() {
         </CardHeader>
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Package</dt>
+            <dt className="text-charcoal/70">Package</dt>
             <dd>{order.packages?.name ?? '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Event date</dt>
+            <dt className="text-charcoal/70">Event date</dt>
             <dd>{new Date(`${order.event_date.slice(0, 10)}T00:00:00`).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Delivery address</dt>
+            <dt className="text-charcoal/70">Delivery address</dt>
             <dd className="text-right">{order.delivery_address}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Delivery contact</dt>
+            <dt className="text-charcoal/70">Delivery contact</dt>
             <dd>{order.delivery_contact_name || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Delivery phone</dt>
+            <dt className="text-charcoal/70">Delivery phone</dt>
             <dd>{order.delivery_phone || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Special requests</dt>
+            <dt className="text-charcoal/70">Special requests</dt>
             <dd className="text-right">{order.special_requests || '—'}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-charcoal/60">Total price</dt>
+            <dt className="text-charcoal/70">Total price</dt>
             <dd>{Number(order.total_price_aud).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}</dd>
           </div>
         </dl>

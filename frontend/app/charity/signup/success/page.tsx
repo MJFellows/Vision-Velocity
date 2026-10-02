@@ -39,7 +39,7 @@ export default async function SignupSuccessPage({
               </ol>
             </div>
 
-            <p className="mb-8 text-sm text-charcoal/60">
+            <p className="mb-8 text-sm text-charcoal/70">
               Any questions? Email us at{' '}
               <a href="mailto:support@visionvelocity.com.au" className="text-accent underline">support@visionvelocity.com.au</a>
             </p>

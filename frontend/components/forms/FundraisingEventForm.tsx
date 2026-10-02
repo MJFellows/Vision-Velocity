@@ -227,7 +227,7 @@ function PackagesPicker({
     <fieldset className="mt-4 space-y-3 border-t border-grey pt-4">
       <legend className="text-sm font-semibold text-navy">Packages used</legend>
       {packages.length === 0 ? (
-        <p className="text-sm text-charcoal/60">
+        <p className="text-sm text-charcoal/70">
           No packages have been set up yet.{' '}
           <a href="/admin/packages" className="text-accent underline">
             Add packages
@@ -236,7 +236,7 @@ function PackagesPicker({
         </p>
       ) : (
         <>
-          <p className="text-xs text-charcoal/60">Enter how many of each package; leave blank if not used.</p>
+          <p className="text-xs text-charcoal/70">Enter how many of each package; leave blank if not used.</p>
           {packages.map((p) => {
             const value = quantities[p.id] ?? '';
             const invalid = value !== '' && !/^\d{1,5}$/.test(value);
@@ -244,8 +244,8 @@ function PackagesPicker({
               <div key={p.id} className="flex items-center justify-between gap-4">
                 <label htmlFor={`pkg-${p.id}`} className="text-sm text-charcoal">
                   {p.name}
-                  {!p.is_active && <span className="ml-1 text-xs text-charcoal/50">(inactive)</span>}
-                  <span className="block text-xs text-charcoal/50">${Number(p.base_price_aud).toFixed(2)}</span>
+                  {!p.is_active && <span className="ml-1 text-xs text-charcoal/70">(inactive)</span>}
+                  <span className="block text-xs text-charcoal/70">${Number(p.base_price_aud).toFixed(2)}</span>
                 </label>
                 <input
                   id={`pkg-${p.id}`}

@@ -84,7 +84,7 @@ export function CharityLayout({ children }: { children: ReactNode }) {
     );
   }
   if (!me) {
-    return <div className="flex min-h-screen items-center justify-center text-charcoal/60">Loading your charity…</div>;
+    return <div className="flex min-h-screen items-center justify-center text-charcoal/70">Loading your charity…</div>;
   }
 
   return (
@@ -93,7 +93,7 @@ export function CharityLayout({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 border-b border-grey bg-white">
           <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
             <div className="min-w-0">
-              <p className="text-xs uppercase text-charcoal/50">Vision Velocity</p>
+              <p className="text-xs uppercase text-charcoal/70">Vision Velocity</p>
               <p className="truncate font-display font-semibold text-navy">{me.charity.name}</p>
             </div>
             <div className="ml-auto flex items-center gap-2">

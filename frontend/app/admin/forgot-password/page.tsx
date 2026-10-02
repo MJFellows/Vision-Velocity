@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
         {sentMessage ? (
           <div className="space-y-4">
             <p className="text-sm text-charcoal/80">{sentMessage}</p>
-            <p className="text-sm text-charcoal/60">
+            <p className="text-sm text-charcoal/70">
               Use the newest email only. If nothing arrives within a few minutes, check your junk
               folder, then try again.
             </p>
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        <div className="mt-6 border-t border-grey pt-4 text-center text-sm text-charcoal/60">
+        <div className="mt-6 border-t border-grey pt-4 text-center text-sm text-charcoal/70">
           <a href="/admin/login" className="text-accent hover:underline">
             Back to sign in
           </a>

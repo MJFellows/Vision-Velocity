@@ -79,7 +79,7 @@ export function BunningsLayout({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  if (!data) return <div className="flex min-h-screen items-center justify-center text-charcoal/60">Loading your store…</div>;
+  if (!data) return <div className="flex min-h-screen items-center justify-center text-charcoal/70">Loading your store…</div>;
 
   return (
     <AoContext.Provider value={{ data, reload: load }}>
@@ -87,7 +87,7 @@ export function BunningsLayout({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 border-b border-grey bg-white">
           <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
             <div className="min-w-0">
-              <p className="text-xs uppercase text-charcoal/60">Vision Velocity · Bunnings Activities Officer</p>
+              <p className="text-xs uppercase text-charcoal/70">Vision Velocity · Bunnings Activities Officer</p>
               <p className="truncate font-display font-semibold text-navy">Bunnings {data.store.location}</p>
             </div>
             <div className="ml-auto flex items-center gap-2">

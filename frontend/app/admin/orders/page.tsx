@@ -77,9 +77,9 @@ export default function AdminOrdersPage() {
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {isLoading ? (
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       ) : orders.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No orders yet. An order records what a charity has asked for (a package, delivery details and price). <Link href="/admin/orders/new" className="text-accent underline">Create the first order</Link> — you need at least one active package.</p>
+        <p className="text-sm text-charcoal/70">No orders yet. An order records what a charity has asked for (a package, delivery details and price). <Link href="/admin/orders/new" className="text-accent underline">Create the first order</Link> — you need at least one active package.</p>
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
@@ -87,7 +87,7 @@ export default function AdminOrdersPage() {
               <Card className="flex items-center justify-between hover:border-accent">
                 <div>
                   <p className="font-medium text-navy">{order.charities?.name ?? 'Charity'}</p>
-                  <p className="text-sm text-charcoal/60">
+                  <p className="text-sm text-charcoal/70">
                     {order.event_date} — {order.packages?.name ?? 'Package'}
                   </p>
                 </div>

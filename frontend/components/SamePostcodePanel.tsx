@@ -65,7 +65,7 @@ export function SamePostcodePanel({
 
   let body: ReactNode;
   if (isLoading) {
-    body = <p className="text-sm text-charcoal/60">Loading…</p>;
+    body = <p className="text-sm text-charcoal/70">Loading…</p>;
   } else if (error) {
     body = <p className="text-sm text-red-600">{error}</p>;
   } else if (!postcode) {
@@ -84,7 +84,7 @@ export function SamePostcodePanel({
               {section.title} ({section.items.length})
             </h3>
             {section.items.length === 0 ? (
-              <p className="text-sm text-charcoal/60">{section.emptyText}</p>
+              <p className="text-sm text-charcoal/70">{section.emptyText}</p>
             ) : (
               <ul className="space-y-2">
                 {section.items.map((item) => (
@@ -94,7 +94,7 @@ export function SamePostcodePanel({
                         <span className="text-sm font-medium text-navy">{item.primary}</span>
                         {item.badge && <Badge>{item.badge}</Badge>}
                       </div>
-                      {item.secondary && <p className="mt-0.5 text-xs text-charcoal/60">{item.secondary}</p>}
+                      {item.secondary && <p className="mt-0.5 text-xs text-charcoal/70">{item.secondary}</p>}
                     </Link>
                   </li>
                 ))}
@@ -113,7 +113,7 @@ export function SamePostcodePanel({
         <header className="flex items-start justify-between gap-3 border-b border-grey px-4 py-4">
           <div>
             <h2 className="text-lg font-semibold text-navy">{title}</h2>
-            {postcode && <p className="text-sm text-charcoal/60">Postcode {postcode}</p>}
+            {postcode && <p className="text-sm text-charcoal/70">Postcode {postcode}</p>}
           </div>
           <Button ref={closeRef} variant="ghost" size="sm" onClick={onClose}>
             Close
@@ -128,7 +128,7 @@ export function SamePostcodePanel({
             disabled={!postcode && !isLoading}
           />
           {radiusKm > 0 && (
-            <p className="mt-1 text-xs text-charcoal/60">Distances are approximate, measured in a straight line. Charities are placed at the centre of their postcode.</p>
+            <p className="mt-1 text-xs text-charcoal/70">Distances are approximate, measured in a straight line. Charities are placed at the centre of their postcode.</p>
           )}
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">{body}</div>

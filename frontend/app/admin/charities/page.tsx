@@ -87,9 +87,9 @@ export default function AdminCharitiesPage() {
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {isLoading ? (
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       ) : charities.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No charities match. New sign-ups from the public site appear here as &ldquo;Awaiting approval&rdquo;; you can also <Link href="/admin/charities/new" className="text-accent underline">add a charity yourself</Link>.</p>
+        <p className="text-sm text-charcoal/70">No charities match. New sign-ups from the public site appear here as &ldquo;Awaiting approval&rdquo;; you can also <Link href="/admin/charities/new" className="text-accent underline">add a charity yourself</Link>.</p>
       ) : (
         <div className="space-y-3">
           {charities.map((charity) => (
@@ -97,7 +97,7 @@ export default function AdminCharitiesPage() {
               <Card className="flex items-center justify-between transition-colors hover:border-accent">
                 <div>
                   <p className="font-medium text-navy">{charity.name}</p>
-                  <p className="text-sm text-charcoal/60">{charity.location || charity.email || 'No location on file'}</p>
+                  <p className="text-sm text-charcoal/70">{charity.location || charity.email || 'No location on file'}</p>
                 </div>
                 <Badge tone={toneForStatus(charity.subscription_status)}>{charity.subscription_status}</Badge>
               </Card>

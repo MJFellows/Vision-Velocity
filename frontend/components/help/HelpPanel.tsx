@@ -37,7 +37,7 @@ export function HelpPanel({ helpHome }: { helpHome: string }) {
           >
             <div className="mb-4 flex items-start justify-between gap-4">
               <h2 className="text-lg font-semibold text-navy">{help?.title ?? 'Help'}</h2>
-              <button type="button" onClick={() => setOpen(false)} className="text-sm text-charcoal/60 underline" aria-label="Close help">
+              <button type="button" onClick={() => setOpen(false)} className="text-sm text-charcoal/70 underline" aria-label="Close help">
                 Close
               </button>
             </div>

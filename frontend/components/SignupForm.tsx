@@ -136,7 +136,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
       <Card className="mx-auto w-full max-w-2xl">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-navy">Tell us about your charity</h2>
-          <p className="mt-2 text-charcoal/60">Step 1 of 4</p>
+          <p className="mt-2 text-charcoal/70">Step 1 of 4</p>
         </div>
         <form onSubmit={step1Form.handleSubmit(onStep1Next)} className="space-y-4">
           <Input
@@ -170,7 +170,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
       <Card className="mx-auto w-full max-w-2xl">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-navy">Your contact details</h2>
-          <p className="mt-2 text-charcoal/60">Step 2 of 4</p>
+          <p className="mt-2 text-charcoal/70">Step 2 of 4</p>
         </div>
         <form onSubmit={step2Form.handleSubmit(onStep2Next)} className="space-y-4">
           <Input
@@ -217,7 +217,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
       <Card className="mx-auto w-full max-w-2xl">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-navy">Plan your first event</h2>
-          <p className="mt-2 text-charcoal/60">Step 3 of 4</p>
+          <p className="mt-2 text-charcoal/70">Step 3 of 4</p>
         </div>
         <form onSubmit={step3Form.handleSubmit(onStep3Next)} className="space-y-4">
           <Input
@@ -266,21 +266,21 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
     <Card className="mx-auto w-full max-w-2xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-navy">Confirm your details</h2>
-        <p className="mt-2 text-charcoal/60">Step 4 of 4</p>
+        <p className="mt-2 text-charcoal/70">Step 4 of 4</p>
       </div>
 
       {serverError && <div className="mb-4 rounded-card bg-red-50 p-4 text-sm text-red-700">{serverError}</div>}
 
       <dl className="mb-6 space-y-3 rounded-card bg-grey/20 p-4 text-sm">
-        <div className="flex justify-between"><dt className="text-charcoal/60">Charity name</dt><dd className="font-medium">{formData.charity_name}</dd></div>
-        <div className="flex justify-between"><dt className="text-charcoal/60">Contact name</dt><dd className="font-medium">{formData.contact_name}</dd></div>
-        <div className="flex justify-between"><dt className="text-charcoal/60">Email</dt><dd className="font-medium">{formData.email}</dd></div>
-        <div className="flex justify-between"><dt className="text-charcoal/60">Phone</dt><dd className="font-medium">{formData.phone}</dd></div>
-        <div className="flex justify-between"><dt className="text-charcoal/60">First event date</dt><dd className="font-medium">{formData.event_date ? new Date(formData.event_date).toLocaleDateString('en-AU') : '—'}</dd></div>
-        <div className="flex justify-between"><dt className="text-charcoal/60">Expected attendees</dt><dd className="font-medium">{formData.expected_attendees}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">Charity name</dt><dd className="font-medium">{formData.charity_name}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">Contact name</dt><dd className="font-medium">{formData.contact_name}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">Email</dt><dd className="font-medium">{formData.email}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">Phone</dt><dd className="font-medium">{formData.phone}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">First event date</dt><dd className="font-medium">{formData.event_date ? new Date(formData.event_date).toLocaleDateString('en-AU') : '—'}</dd></div>
+        <div className="flex justify-between"><dt className="text-charcoal/70">Expected attendees</dt><dd className="font-medium">{formData.expected_attendees}</dd></div>
       </dl>
 
-      <p className="mb-6 text-sm text-charcoal/60">
+      <p className="mb-6 text-sm text-charcoal/70">
         By submitting this form, you agree to let Vision Velocity review your application. We&apos;ll email you
         within 24 hours.
       </p>

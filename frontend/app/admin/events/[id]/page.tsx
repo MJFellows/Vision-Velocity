@@ -137,7 +137,7 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <AdminLayout>
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       </AdminLayout>
     );
   }
@@ -184,7 +184,7 @@ export default function EventDetailPage() {
         <Card className="mb-6 max-w-lg">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/60">Charity</dt>
+              <dt className="text-charcoal/70">Charity</dt>
               <dd className="text-right">
                 {event.charities ? (
                   <Link className="text-accent hover:underline" href={`/admin/charities/${event.charities.id}`}>
@@ -196,7 +196,7 @@ export default function EventDetailPage() {
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/60">Bunnings store</dt>
+              <dt className="text-charcoal/70">Bunnings store</dt>
               <dd className="text-right">
                 {event.bunnings_stores ? (
                   <Link className="text-accent hover:underline" href={`/admin/bunnings/${event.bunnings_stores.id}`}>
@@ -205,11 +205,11 @@ export default function EventDetailPage() {
                 ) : (
                   '—'
                 )}
-                {event.bunnings_stores?.postcode && <span className="block text-xs text-charcoal/60">Postcode {event.bunnings_stores.postcode}</span>}
+                {event.bunnings_stores?.postcode && <span className="block text-xs text-charcoal/70">Postcode {event.bunnings_stores.postcode}</span>}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/60">Notes</dt>
+              <dt className="text-charcoal/70">Notes</dt>
               <dd className="whitespace-pre-wrap text-right">{event.notes || '—'}</dd>
             </div>
           </dl>
@@ -225,7 +225,7 @@ export default function EventDetailPage() {
 
           <h2 className="mb-2 mt-6 text-sm font-semibold text-navy">Packages used</h2>
           {event.event_packages.length === 0 ? (
-            <p className="text-sm text-charcoal/60">None recorded.</p>
+            <p className="text-sm text-charcoal/70">None recorded.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {event.event_packages.map((p) => (
@@ -313,7 +313,7 @@ export default function EventDetailPage() {
           </p>
         )}
         {event.event_suppliers.length === 0 ? (
-          <p className="text-sm text-charcoal/60">No suppliers linked yet. Search below to add one.</p>
+          <p className="text-sm text-charcoal/70">No suppliers linked yet. Search below to add one.</p>
         ) : (
           <ul className="space-y-3">
             {event.event_suppliers.map((link) => (
@@ -326,7 +326,7 @@ export default function EventDetailPage() {
                   ) : (
                     <span className="text-sm font-medium">Supplier</span>
                   )}
-                  <p className="text-xs text-charcoal/60">
+                  <p className="text-xs text-charcoal/70">
                     {link.suppliers ? `${link.suppliers.supplier_chain} · ${[link.suppliers.suburb, link.suppliers.state, link.suppliers.postcode].filter(Boolean).join(' ')}` : ''}
                   </p>
                 </div>
@@ -387,14 +387,14 @@ export default function EventDetailPage() {
           )}
         </div>
         {searchError && <p className="mb-3 text-sm text-red-600">{searchError}</p>}
-        {results && results.length === 0 && <p className="text-sm text-charcoal/60">No suppliers match.</p>}
+        {results && results.length === 0 && <p className="text-sm text-charcoal/70">No suppliers match.</p>}
         {results && results.length > 0 && (
           <ul className="space-y-2">
             {results.map((s) => (
               <li key={s.id} className="flex items-center justify-between gap-3 rounded-card border border-grey p-3">
                 <div>
                   <p className="text-sm font-medium text-navy">{s.store_name}</p>
-                  <p className="text-xs text-charcoal/60">
+                  <p className="text-xs text-charcoal/70">
                     {s.supplier_chain} · {[s.suburb, s.state, s.postcode].filter(Boolean).join(' ')}
                   </p>
                 </div>
@@ -413,7 +413,7 @@ export default function EventDetailPage() {
 function DetailRow({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="text-charcoal/60">{label}</dt>
+      <dt className="text-charcoal/70">{label}</dt>
       <dd className="text-right">{value === null || value === undefined || value === '' ? '—' : value}</dd>
     </div>
   );

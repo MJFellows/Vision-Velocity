@@ -49,7 +49,7 @@ export default function SupplierDetailPage() {
   if (!supplier) {
     return (
       <AdminLayout>
-        <p className="text-sm text-charcoal/60">Loading…</p>
+        <p className="text-sm text-charcoal/70">Loading…</p>
       </AdminLayout>
     );
   }
@@ -166,7 +166,7 @@ export default function SupplierDetailPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-charcoal/60">No facilities recorded for this store.</p>
+            <p className="text-sm text-charcoal/70">No facilities recorded for this store.</p>
           )}
         </Card>
       </div>
@@ -178,7 +178,7 @@ export default function SupplierDetailPage() {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="text-charcoal/60">{label}</dt>
+      <dt className="text-charcoal/70">{label}</dt>
       <dd className="text-right">{value || '—'}</dd>
     </div>
   );

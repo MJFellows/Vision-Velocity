@@ -22,7 +22,7 @@ export default function NewEventPage() {
           <CardTitle>Event details</CardTitle>
         </CardHeader>
         <FundraisingEventForm onSubmit={handleSubmit} submitLabel="Add event" />
-        <p className="mt-4 text-xs text-charcoal/60">Suppliers are added on the next screen, once the event exists.</p>
+        <p className="mt-4 text-xs text-charcoal/70">Suppliers are added on the next screen, once the event exists.</p>
       </Card>
     </AdminLayout>
   );

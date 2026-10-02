@@ -63,7 +63,7 @@ function SetPassword() {
       <form onSubmit={submit} className="space-y-4" data-form="Charity set password">
         <Input label="New password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <Input label="Confirm password" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-        <p className="text-xs text-charcoal/60">At least 8 characters, including an uppercase letter and a number. This link works once.</p>
+        <p className="text-xs text-charcoal/70">At least 8 characters, including an uppercase letter and a number. This link works once.</p>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <Button type="submit" className="w-full" isLoading={busy}>
           Save password

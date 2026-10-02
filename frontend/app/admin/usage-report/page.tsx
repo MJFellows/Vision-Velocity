@@ -33,7 +33,7 @@ interface Feedback {
 }
 
 function CountList({ items, empty = 'Nothing recorded yet.' }: { items: Count[]; empty?: string }) {
-  if (items.length === 0) return <p className="text-sm text-charcoal/60">{empty}</p>;
+  if (items.length === 0) return <p className="text-sm text-charcoal/70">{empty}</p>;
   const max = Math.max(...items.map((i) => i.count));
   return (
     <ul className="space-y-2 text-sm">
@@ -87,7 +87,7 @@ export default function UsageReportPage() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="mb-1">Site usage</h1>
-          <p className="text-sm text-charcoal/60">
+          <p className="text-sm text-charcoal/70">
             Which pages and buttons are used, so we can put the most-used things first.{' '}
             <Link href="/admin/help/usage-and-privacy" className="text-accent underline">
               What is recorded
@@ -109,13 +109,13 @@ export default function UsageReportPage() {
         </div>
       </div>
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-      {!report && !error && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {!report && !error && <p className="text-sm text-charcoal/70">Loading…</p>}
 
       {report && (
         <div className="grid gap-6 lg:grid-cols-2">
           {Object.keys(report.userTypes).length === 0 && (
             <Card className="lg:col-span-2">
-              <p className="text-sm text-charcoal/60">No usage recorded yet for this period. Figures appear as people use the site.</p>
+              <p className="text-sm text-charcoal/70">No usage recorded yet for this period. Figures appear as people use the site.</p>
             </Card>
           )}
           {Object.entries(report.userTypes).map(([type, t]) => (
@@ -171,20 +171,20 @@ export default function UsageReportPage() {
           <CardTitle>Feedback</CardTitle>
         </CardHeader>
         {feedback.length === 0 ? (
-          <p className="text-sm text-charcoal/60">No feedback yet.</p>
+          <p className="text-sm text-charcoal/70">No feedback yet.</p>
         ) : (
           <ul className="divide-y divide-grey">
             {feedback.map((f) => (
               <li key={f.id} className="py-3 text-sm">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <p className="text-charcoal/60">
+                  <p className="text-charcoal/70">
                     {new Date(f.created_at).toLocaleString('en-AU')} · {f.user_type === 'charity' ? 'Charity' : 'Admin'} · {f.user_email ?? 'unknown'} · {f.page ?? ''}
                   </p>
                   <button type="button" className="text-accent underline" onClick={() => markDone(f.id, f.status === 'new' ? 'done' : 'new')}>
                     {f.status === 'new' ? 'Mark as dealt with' : 'Reopen'}
                   </button>
                 </div>
-                <p className={`mt-1 whitespace-pre-wrap ${f.status === 'done' ? 'text-charcoal/50 line-through' : 'text-charcoal'}`}>{f.message}</p>
+                <p className={`mt-1 whitespace-pre-wrap ${f.status === 'done' ? 'text-charcoal/70 line-through' : 'text-charcoal'}`}>{f.message}</p>
               </li>
             ))}
           </ul>

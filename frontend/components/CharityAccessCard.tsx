@@ -85,7 +85,7 @@ export function CharityAccessCard({ charityId, charityEmail, charityContact, app
         <CardTitle>Sign-in access</CardTitle>
       </CardHeader>
       {!approved && <p className="mb-3 text-sm text-charcoal/70">Approving the charity gives its contact a sign-in automatically.</p>}
-      {users === null && <p className="text-sm text-charcoal/60">Loading…</p>}
+      {users === null && <p className="text-sm text-charcoal/70">Loading…</p>}
       {users && users.length === 0 && (
         <div className="mb-3 text-sm text-charcoal/70">
           <p>Nobody can sign in for this charity yet.</p>
@@ -105,7 +105,7 @@ export function CharityAccessCard({ charityId, charityEmail, charityContact, app
                   <p className="font-medium text-navy">
                     {u.name || u.email} {u.role === 'owner' && <Badge tone="info">Main contact</Badge>} {!u.is_active && <Badge tone="danger">Switched off</Badge>}
                   </p>
-                  <p className="text-xs text-charcoal/60">
+                  <p className="text-xs text-charcoal/70">
                     {u.email} · last signed in {when(u.last_sign_in_at)}
                   </p>
                 </div>

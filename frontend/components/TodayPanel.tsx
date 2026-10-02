@@ -51,7 +51,7 @@ function Row({ href, main, sub }: { href: string; main: string; sub?: string }) 
     <li>
       <Link href={href} className="block px-3 py-2 hover:bg-grey/30">
         <span className="text-sm font-medium text-navy">{main}</span>
-        {sub && <span className="block text-xs text-charcoal/60">{sub}</span>}
+        {sub && <span className="block text-xs text-charcoal/70">{sub}</span>}
       </Link>
     </li>
   );
@@ -92,7 +92,7 @@ export function TodayPanel() {
           <CardTitle>Needs attention</CardTitle>
         </CardHeader>
         {error && <p className="text-sm text-red-600">Could not load this list — try refreshing.</p>}
-        {!data && !error && <p className="text-sm text-charcoal/60">Checking…</p>}
+        {!data && !error && <p className="text-sm text-charcoal/70">Checking…</p>}
         {data && total === 0 && <p className="text-sm text-green-700">All clear — nothing needs attention right now.</p>}
         {data && (
           <>
@@ -147,13 +147,13 @@ export function TodayPanel() {
           <CardTitle>Recently viewed</CardTitle>
         </CardHeader>
         {recent.length === 0 ? (
-          <p className="text-sm text-charcoal/60">Records you open (charities, events, orders, stores) will appear here.</p>
+          <p className="text-sm text-charcoal/70">Records you open (charities, events, orders, stores) will appear here.</p>
         ) : (
           <ul className="space-y-2 text-sm">
             {recent.map((r) => (
               <li key={r.path}>
                 <Link href={r.path} className="text-navy hover:underline">
-                  <span className="mr-2 text-xs uppercase text-charcoal/50">{r.kind}</span>
+                  <span className="mr-2 text-xs uppercase text-charcoal/70">{r.kind}</span>
                   {r.label}
                 </Link>
               </li>
