@@ -109,6 +109,11 @@ export class PdfWriter {
     this.y -= h + 10;
   }
 
+  /** Starts a new page now if less than `space` points remain (keeps a section together). */
+  keepTogether(space: number) {
+    this.ensure(space);
+  }
+
   heading(text: string) {
     this.ensure(40);
     this.y -= 8;

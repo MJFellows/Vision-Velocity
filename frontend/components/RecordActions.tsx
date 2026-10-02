@@ -55,15 +55,18 @@ export function RecordActions({
 
   const path = allowPrices && includePrices ? `${documentPath}?include_prices=true` : documentPath;
 
+  // Depend on the primitive values: callers pass a new object on every render.
+  const historyType = historyFor?.type;
+  const historyId = historyFor?.id;
   const loadHistory = useCallback(async () => {
-    if (!historyFor) return;
+    if (!historyType || !historyId) return;
     try {
-      const res = await api.get<{ data: SentEmail[] }>('/api/admin/record-emails', { record_type: historyFor.type, record_id: historyFor.id });
+      const res = await api.get<{ data: SentEmail[] }>('/api/admin/record-emails', { record_type: historyType, record_id: historyId });
       setHistory(res.data);
     } catch {
       // History is optional; leave it empty if it cannot be loaded.
     }
-  }, [historyFor]);
+  }, [historyType, historyId]);
 
   useEffect(() => {
     loadHistory();

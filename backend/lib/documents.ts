@@ -263,6 +263,7 @@ export async function buildRunSheetPdf(e: EventDoc, opts: RunSheetOptions): Prom
     pdf.paragraph(e.notes);
   }
 
+  pdf.keepTogether(130);
   pdf.heading('Results');
   if (e.actual_hotdogs_sold != null || e.number_of_sales != null || e.sales_value_aud != null) {
     pdf.row('Hotdogs sold', e.actual_hotdogs_sold, true);
