@@ -5,6 +5,7 @@ import { ValidationError, NotFoundError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges, getAuditTrail, getAdminActionLog } from '@/lib/audit';
+import { sendOrderConfirmedEmail, type AutoEmailResult } from '@/lib/order-emails';
 
 const updateOrderSchema = z
   .object({
@@ -18,6 +19,8 @@ const updateOrderSchema = z
     special_requests: z.string().nullable(),
     total_price_aud: z.number().nonnegative(),
     completed_at: z.string().nullable(),
+    /** When the status changes to Confirmed: email the charity its invoice (default yes). Not stored. */
+    notify_charity: z.boolean(),
   })
   .partial();
 
@@ -77,7 +80,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         Object.fromEntries(parsed.error.issues.map((i) => [i.path.join('.'), i.message]))
       );
     }
-    if (Object.keys(parsed.data).length === 0) {
+    const { notify_charity: notifyCharity = true, ...fields } = parsed.data;
+    if (Object.keys(fields).length === 0) {
       throw new ValidationError('No fields to update');
     }
 
@@ -93,7 +97,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const { data, error } = await supabase
       .from('orders')
-      .update(parsed.data)
+      .update(fields)
       .eq('id', id)
       .select()
       .maybeSingle();
@@ -108,7 +112,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       adminUserId,
       userEmail: adminEmail,
       action: 'updated_order',
-      description: `Updated order ${data.id} (${Object.keys(parsed.data).join(', ')})`,
+      description: `Updated order ${data.id} (${Object.keys(fields).join(', ')})`,
       entityType: 'orders',
       entityId: data.id,
       changes: diffChanges(before, data),
@@ -118,7 +122,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       userAgent,
     });
 
-    return NextResponse.json({ data }, { headers: cors });
+    // First time an order becomes Confirmed: issue the invoice and email it to the charity.
+    let autoEmail: AutoEmailResult | undefined;
+    if (fields.status === 'confirmed' && before.status !== 'confirmed' && notifyCharity) {
+      autoEmail = await sendOrderConfirmedEmail(data.id, adminEmail).catch((e: unknown) => ({
+        status: 'failed' as const,
+        detail: e instanceof Error ? e.message : String(e),
+      }));
+    }
+
+    return NextResponse.json({ data, autoEmail }, { headers: cors });
   } catch (error) {
     if (!(error instanceof ValidationError)) {
       await logAdminAction({

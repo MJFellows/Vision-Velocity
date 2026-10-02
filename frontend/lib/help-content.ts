@@ -6,7 +6,7 @@
 
 export interface HelpGuide {
   slug: string;
-  audience: 'admin' | 'charity';
+  audience: 'admin' | 'charity' | 'bunnings';
   title: string;
   summary: string;
   steps: string[];
@@ -23,6 +23,49 @@ export interface PageHelp {
 
 export const GUIDES: HelpGuide[] = [
   // ---------------- Admin guides ----------------
+  {
+    slug: 'invoices',
+    audience: 'admin',
+    title: 'Invoices',
+    summary: 'How invoices are issued, sent, paid and corrected.',
+    steps: [
+      'First, a founder fills in Invoices → Invoice settings: ABN, address, payment instructions and how many days the charity has to pay. Invoices cannot be issued until the ABN and payment instructions are filled in.',
+      'When you set an order to Confirmed, the site issues the invoice (numbered VV-001001 onwards) and emails it, with the order summary, to the charity. You can choose "Confirm without emailing" instead.',
+      'You can also press Issue invoice on the order page at any time.',
+      'When the money arrives, open the order and press Mark as paid.',
+      'To correct a mistake, press Void invoice and give a reason, then Issue invoice again. The new invoice has a new number; the voided one stays on record.',
+      'Invoices → filter "Overdue" shows unpaid invoices past their due date. They also appear under Needs attention and in the daily summary email.',
+    ],
+    tips: [
+      'Vision Velocity is not registered for GST, so documents are titled "Invoice" (not "Tax invoice") and say no GST has been charged.',
+      'An invoice keeps the price and details it was issued with, even if the order or settings change later.',
+    ],
+    related: ['create-order', 'automatic-emails'],
+  },
+  {
+    slug: 'automatic-emails',
+    audience: 'admin',
+    title: 'Emails the site sends by itself',
+    summary: 'Order emails to charities and the founders\' morning summary.',
+    steps: [
+      'Order received: when you create an order (with "Email the charity" ticked), the charity is emailed the order summary.',
+      'Order confirmed: the first time an order is set to Confirmed, the charity is emailed its invoice and the order summary.',
+      'Founders\' daily summary: each morning between 7 and 8 am (Brisbane time) every active founder is emailed what is in Needs attention. If nothing needs attention, no email is sent.',
+      'Each order page lists its automatic emails under Invoice → Automatic emails, including any that failed or were not sent (for example because the charity has no email address).',
+    ],
+  },
+  {
+    slug: 'bunnings-officers',
+    audience: 'admin',
+    title: 'Give a Bunnings Activities Officer access',
+    summary: 'Let a store\'s Activities Officer see the events at their store.',
+    steps: [
+      'Open Bunnings stores and the store. Make sure the Activities Officer\'s name and email are filled in.',
+      'Press Email sign-in link. The officer receives a link that works once and lasts 7 days.',
+      'They see upcoming and recent events at their store (no prices), can print run sheets and can correct their own contact details. You are emailed if they change them.',
+      'Officers can ask for a new link themselves from the Bunnings sign-in page, using the email address on file.',
+    ],
+  },
   {
     slug: 'getting-started',
     audience: 'admin',
@@ -210,8 +253,20 @@ export const GUIDES: HelpGuide[] = [
     steps: [
       'Open an event for its run sheet, or an order for its order summary.',
       'Choose Print, Download PDF or Email. To email, type the address, add a note if you like and press Send.',
-      'Order summaries are not tax invoices.',
+      'Order summaries are not invoices. Your invoice is emailed when the order is confirmed and is also on the order page.',
     ],
+  },
+  {
+    slug: 'charity-invoices',
+    audience: 'charity',
+    title: 'Your invoices',
+    summary: 'When invoices arrive and how to pay.',
+    steps: [
+      'When Vision Velocity confirms your order, you are emailed the invoice and the order summary.',
+      'You can also open the order under My orders and press Print or Download PDF under Invoice.',
+      'Payment details and the due date are on the invoice. Please quote the invoice number when you pay.',
+    ],
+    tips: ['Vision Velocity is not registered for GST, so no GST is charged on its invoices.'],
   },
   {
     slug: 'charity-sign-in',
@@ -221,6 +276,50 @@ export const GUIDES: HelpGuide[] = [
     steps: [
       'Go to the charity sign-in page and enter your email and password.',
       'No password, or forgotten it? Choose "Email me a sign-in link" or "Forgot password?". Use the newest email; links work once and expire after an hour.',
+    ],
+  },
+  // ---------------- Bunnings Activities Officer guides ----------------
+  {
+    slug: 'ao-start',
+    audience: 'bunnings',
+    title: 'What this area is for',
+    summary: 'See the charity sausage sizzles at your store.',
+    steps: [
+      'Events at my store lists the sausage sizzles Vision Velocity is arranging at your store, with the charity, its contact person and phone, the stall location and the number of volunteers.',
+      'Events that are still only being discussed with the charity are not shown until they are planned.',
+      'The last six months of events are listed underneath.',
+    ],
+    related: ['ao-run-sheet', 'ao-details'],
+  },
+  {
+    slug: 'ao-run-sheet',
+    audience: 'bunnings',
+    title: 'Print a run sheet',
+    summary: 'Everything about the day on one page.',
+    steps: [
+      'On Events at my store, find the event and press Print run sheet or Download PDF.',
+      'Add to calendar puts the event in your phone or Outlook calendar.',
+    ],
+  },
+  {
+    slug: 'ao-details',
+    audience: 'bunnings',
+    title: 'Update your contact details',
+    summary: 'Keep your name, email and phone up to date.',
+    steps: [
+      'Open My details, correct your name, email or phone and press Save my details.',
+      'Vision Velocity is told about the change. Future sign-in links go to the new email address.',
+      'If the store\'s own details are wrong, use Contact us at the top of the page.',
+    ],
+  },
+  {
+    slug: 'ao-sign-in',
+    audience: 'bunnings',
+    title: 'Signing in',
+    summary: 'No password — a link is emailed to you.',
+    steps: [
+      'Open the link in the email from Vision Velocity. You stay signed in on that device for 7 days.',
+      'Link used or expired? Go to the Bunnings sign-in page, enter your work email and press Email me a sign-in link.',
     ],
   },
 ];
@@ -238,7 +337,9 @@ export const GLOSSARY: { term: string; meaning: string }[] = [
   { term: 'Package', meaning: 'What a charity orders for an event, such as a set number of sausages, bread and sauce.' },
   { term: 'Component', meaning: 'One item inside a package, such as a carton of sausages or a pack of napkins.' },
   { term: 'Run sheet', meaning: 'A printable page with everything needed on the day: store, times, staff, packages, suppliers and contacts.' },
-  { term: 'Order summary', meaning: 'A printable record of an order. It is not a tax invoice.' },
+  { term: 'Order summary', meaning: 'A printable record of an order. It is not an invoice.' },
+  { term: 'Invoice', meaning: 'The bill for an order, issued when the order is confirmed. Vision Velocity is not registered for GST, so it is an invoice, not a tax invoice, and no GST is charged.' },
+  { term: 'Void (invoice)', meaning: 'An invoice cancelled because of a mistake. It stays on record; a corrected invoice gets a new number.' },
   { term: 'Head-office negotiations', meaning: 'Our discussions with each supermarket chain\'s head office (formerly "Supplier status").' },
 ];
 
@@ -255,11 +356,13 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   '/admin/events/[id]': P('Event', 'One event: details, checklist, suppliers, packages, results and documents.', ['Check the checklist for anything missing', 'Add supplier stores', 'Print or email the run sheet', 'Confirm a charity\'s request'], ['plan-event', 'event-results', 'print-email']),
   '/admin/orders': P('Orders', 'What each charity has ordered.', ['Create a new order', 'Filter by status', 'Download the list as a spreadsheet'], ['create-order']),
   '/admin/orders/new': P('New order', 'Record an order for a charity.', ['Choose charity and package', 'Enter delivery details and price'], ['create-order']),
-  '/admin/orders/[id]': P('Order', 'One order: details, status and documents.', ['Edit the order', 'Change the status', 'Print or email the order summary'], ['create-order', 'print-email']),
+  '/admin/orders/[id]': P('Order', 'One order: details, status, invoice and documents.', ['Edit the order', 'Change the status (Confirmed issues and emails the invoice)', 'Mark the invoice paid, or void it', 'Print or email the order summary or invoice'], ['create-order', 'invoices', 'print-email']),
+  '/admin/invoices': P('Invoices', 'Every invoice issued, and what is still to be paid.', ['Filter to Overdue or Awaiting payment', 'Open an invoice\'s order to mark it paid', 'Download the list as a spreadsheet'], ['invoices']),
+  '/admin/invoice-settings': P('Invoice settings', 'The business details printed on invoices.', ['Enter the ABN, address and payment instructions', 'Set how many days charities have to pay'], ['invoices']),
   '/admin/packages': P('Packages', 'What charities can order.', ['Add or edit a package', 'Set its contents', 'Make it active when ready'], ['set-up-packages']),
   '/admin/components': P('Components', 'The items and ingredients that go into packages.', ['Add a component', 'Upload a photo', 'Record target buy and sell prices'], ['set-up-packages']),
   '/admin/bunnings': P('Bunnings stores', 'All Bunnings stores, with filters by state and postcode.', ['Find a store', 'Open it to see nearby suppliers and charities'], ['plan-event']),
-  '/admin/bunnings/[id]': P('Bunnings store', 'One store with its details and nearby suppliers and charities.', ['See suppliers or charities in the same postcode or nearby'], ['plan-event']),
+  '/admin/bunnings/[id]': P('Bunnings store', 'One store with its details and nearby suppliers and charities.', ['See suppliers or charities in the same postcode or nearby', 'Email the Activities Officer a sign-in link'], ['plan-event', 'bunnings-officers']),
   '/admin/suppliers': P('Suppliers', 'Supermarket stores (Woolworths, Coles, IGA) that can supply events.', ['Filter by chain, state or postcode', 'Open a store to see or edit its contact'], ['plan-event']),
   '/admin/suppliers/[id]': P('Supplier store', 'One supermarket store and its contact.', ['Press Edit to update the store contact'], ['plan-event']),
   '/admin/supplier-status': P('Head-office negotiations', 'Our discussions with each supermarket chain\'s head office.', ['Record the latest status and contact for each chain'], []),
@@ -270,7 +373,10 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   '/charity/my-events/new': P('Request an event', 'Ask Vision Velocity to arrange a sausage sizzle.', ['Choose a date and store', 'Add other dates that suit'], ['charity-request-event']),
   '/charity/my-events/[id]': P('Event', 'Details of one of your events.', ['Print or email the run sheet', 'Enter your results after the event'], ['charity-results', 'charity-print-email']),
   '/charity/orders': P('My orders', 'What has been ordered for your events.', ['Open an order for its summary'], ['charity-print-email']),
-  '/charity/orders/[id]': P('Order', 'One of your orders.', ['Print, download or email the order summary'], ['charity-print-email']),
+  '/charity/orders/[id]': P('Order', 'One of your orders.', ['Print, download or email the order summary', 'Print or download your invoice'], ['charity-print-email', 'charity-invoices']),
+  '/bunnings/activities-officer/events': P('Events at my store', 'Charity sausage sizzles at your store.', ['Print or download a run sheet', 'Add an event to your calendar', 'Phone the charity contact'], ['ao-start', 'ao-run-sheet']),
+  '/bunnings/activities-officer/store': P('My details', 'Your contact details for this store.', ['Correct your name, email or phone'], ['ao-details']),
+  '/bunnings/activities-officer/help': P('Help', 'Guides for the Bunnings area.', ['Read a guide', 'Contact Vision Velocity'], ['ao-start', 'ao-sign-in']),
   '/charity/profile': P('Profile', 'Your charity\'s contact details and the people who can sign in.', ['Update your details', 'Add a person (main contact only)'], ['charity-start']),
   '/charity/help': P('Help', 'Guides for using your charity area.', ['Read a guide', 'Contact Vision Velocity'], ['charity-start']),
 };

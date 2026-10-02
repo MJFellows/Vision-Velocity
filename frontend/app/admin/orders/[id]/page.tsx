@@ -10,6 +10,9 @@ import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { OrderForm, type toOrderPayload } from '@/components/forms/OrderForm';
 import { RecordActions } from '@/components/RecordActions';
+import { InvoiceCard } from '@/components/InvoiceCard';
+import { api, ApiRequestError } from '@/lib/api';
+import { statusLabel } from '@/lib/labels';
 import { getOrder, updateOrder } from '@/lib/adminApi';
 import type { OrderStatus } from '@/lib/types';
 import type { OrderWithRelations } from '@/lib/adminApi';
@@ -29,6 +32,8 @@ export default function OrderDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState(false);
+  const [invoiceReload, setInvoiceReload] = useState(0);
 
   const load = useCallback(async () => {
     try {
@@ -50,16 +55,36 @@ export default function OrderDetailPage() {
     await load();
   };
 
-  const handleStatusChange = async (status: OrderStatus) => {
+  const saveStatus = async (status: OrderStatus, notifyCharity = true) => {
     setIsSaving(true);
+    setError(null);
+    setMessage(null);
+    setPendingConfirm(false);
     try {
-      await updateOrder(id, { status });
+      const res = await api.patch<{ autoEmail?: { status: string; detail: string; invoiceNumber?: string } }>(`/api/admin/orders/${id}`, {
+        status,
+        notify_charity: notifyCharity,
+      });
+      const a = res.autoEmail;
+      if (a?.status === 'sent') setMessage(`Status changed to ${statusLabel(status)}. ${a.invoiceNumber ? `Invoice ${a.invoiceNumber} and the order summary were` : 'The order summary was'} emailed to the charity.`);
+      else if (a?.status === 'failed') setError(`Status changed, but the email to the charity failed: ${a.detail}`);
+      else if (a?.status === 'skipped') setMessage(`Status changed to ${statusLabel(status)}. No email sent: ${a.detail}.`);
+      else setMessage(`Status changed to ${statusLabel(status)}.`);
       await load();
-    } catch {
-      setError('Could not update status — try again.');
+      setInvoiceReload((n) => n + 1);
+    } catch (err) {
+      setError(err instanceof ApiRequestError ? err.message : 'Could not update status — try again.');
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleStatusChange = (status: OrderStatus) => {
+    if (status === 'confirmed' && order?.status !== 'confirmed') {
+      setPendingConfirm(true);
+      return;
+    }
+    saveStatus(status);
   };
 
   if (error && !order) {
@@ -160,8 +185,11 @@ export default function OrderDetailPage() {
           emailPath={`/api/admin/orders/${order.id}/email`}
           filename={`Order-summary-${order.id.slice(0, 8).toUpperCase()}.pdf`}
           historyFor={{ type: 'order', id: order.id }}
+          historyDocument="order_summary"
         />
       )}
+
+      {!isEditing && <InvoiceCard orderId={order.id} reloadKey={invoiceReload} />}
 
       <Card className="max-w-lg">
         <CardHeader>
@@ -173,6 +201,22 @@ export default function OrderDetailPage() {
           onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
           options={STATUS_OPTIONS}
         />
+        {pendingConfirm && (
+          <div className="mt-3 rounded-card border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="mb-2">Confirming the order issues its invoice and emails the invoice and order summary to the charity.</p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" isLoading={isSaving} onClick={() => saveStatus('confirmed', true)}>
+                Confirm and email the charity
+              </Button>
+              <Button type="button" variant="outline" disabled={isSaving} onClick={() => saveStatus('confirmed', false)}>
+                Confirm without emailing
+              </Button>
+              <Button type="button" variant="outline" disabled={isSaving} onClick={() => setPendingConfirm(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
     </AdminLayout>
   );

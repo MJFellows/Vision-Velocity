@@ -179,12 +179,16 @@ export async function loadEventDoc(id: string, charityId?: string): Promise<Even
 
 export interface RunSheetOptions {
   includePrices: boolean;
-  /** Charity copies leave out internal notes and supplier contact people. */
-  audience: 'admin' | 'charity';
+  /**
+   * Charity copies leave out internal notes and supplier contact people.
+   * Bunnings copies also leave out the supplier stores (and never show prices).
+   */
+  audience: 'admin' | 'charity' | 'bunnings';
 }
 
 export async function buildRunSheetPdf(e: EventDoc, opts: RunSheetOptions): Promise<Uint8Array> {
   const title = e.event_name || `${e.charities?.name ?? 'Charity'} sausage sizzle`;
+  if (opts.audience === 'bunnings') opts = { ...opts, includePrices: false };
   const pdf = await PdfWriter.create(`Run sheet - ${title} - printed ${printedOn()}`);
   pdf.title(`Run sheet: ${title}`, `${longDate(e.event_date)} · ${e.bunnings_stores?.location ?? ''} Bunnings`);
 
@@ -238,7 +242,7 @@ export async function buildRunSheetPdf(e: EventDoc, opts: RunSheetOptions): Prom
     );
   }
 
-  const suppliers = e.event_suppliers.filter((x) => x.status !== 'declined');
+  const suppliers = opts.audience === 'bunnings' ? [] : e.event_suppliers.filter((x) => x.status !== 'declined');
   if (suppliers.length > 0) {
     pdf.heading('Supplier stores');
     pdf.table(
@@ -278,6 +282,113 @@ export async function buildRunSheetPdf(e: EventDoc, opts: RunSheetOptions): Prom
   return pdf.finish();
 }
 
+
+function pickList(e: EventDoc): [string, { qty: number; storage: string | null }][] {
+  const pick = new Map<string, { qty: number; storage: string | null }>();
+  for (const p of e.event_packages) {
+    for (const c of p.packages?.package_components ?? []) {
+      const key = c.components?.name ?? '';
+      const prev = pick.get(key);
+      pick.set(key, { qty: (prev?.qty ?? 0) + Number(c.quantity) * Number(p.quantity), storage: c.components?.storage ?? null });
+    }
+  }
+  const order = { shelf: 0, refrigerated: 1, frozen: 2 } as Record<string, number>;
+  return [...pick.entries()].sort((a, b) => (order[a[1].storage ?? 'shelf'] ?? 0) - (order[b[1].storage ?? 'shelf'] ?? 0));
+}
+
+// ---------------------------------------------------------------------------
+// Results summary (a fundraising record for the charity's committee)
+// ---------------------------------------------------------------------------
+
+export function hasResults(e: EventDoc): boolean {
+  return e.actual_hotdogs_sold != null || e.number_of_sales != null || e.sales_value_aud != null;
+}
+
+export async function buildResultsSummaryPdf(e: EventDoc): Promise<Uint8Array> {
+  const title = e.event_name || `${e.charities?.name ?? 'Charity'} sausage sizzle`;
+  const pdf = await PdfWriter.create(`Results summary - ${title} - printed ${printedOn()}`);
+  pdf.title('Fundraising results', `${title} · ${longDate(e.event_date)}`);
+
+  pdf.heading('The event');
+  pdf.row('Charity', e.charities?.name, true);
+  pdf.row('Date', longDate(e.event_date), true);
+  pdf.row('Bunnings store', e.bunnings_stores?.location, true);
+  pdf.row('Stall location', e.cover_type ? COVER_LABELS[e.cover_type] : null);
+  pdf.row('Volunteers planned', e.estimated_staff);
+  pdf.row('Shifts', e.number_of_shifts);
+
+  pdf.heading('Results');
+  if (hasResults(e)) {
+    pdf.row('Hotdogs sold', e.actual_hotdogs_sold, true);
+    pdf.row('Number of sales', e.number_of_sales, true);
+    pdf.row('Value of sales', money(e.sales_value_aud), true);
+    if (e.estimated_hotdogs && e.actual_hotdogs_sold != null) {
+      pdf.row('Hotdogs sold against estimate', `${e.actual_hotdogs_sold} of ${e.estimated_hotdogs} (${Math.round((e.actual_hotdogs_sold / e.estimated_hotdogs) * 100)}%)`);
+    }
+    if (e.sales_value_aud != null && e.number_of_sales) {
+      pdf.row('Average sale', money(Number(e.sales_value_aud) / e.number_of_sales));
+    }
+  } else {
+    pdf.paragraph('No results have been entered for this event yet.');
+  }
+
+  if (e.event_packages.length > 0) {
+    pdf.heading('Packages used');
+    pdf.table(['Package', 'Quantity'], e.event_packages.map((p) => [p.packages?.name ?? '', p.quantity]), [0.75, 0.25]);
+  }
+  pdf.paragraph('Sales figures are as entered on the Vision Velocity website by the charity or Vision Velocity. They are a record of takings, not a statement of profit.', 9);
+  pdf.paragraph(`Vision Velocity · ${SUPPORT_EMAIL}`, 9);
+  return pdf.finish();
+}
+
+// ---------------------------------------------------------------------------
+// Supplier sheet (what is needed from supplier stores for one event)
+// ---------------------------------------------------------------------------
+
+export async function buildSupplierSheetPdf(e: EventDoc): Promise<Uint8Array> {
+  const title = e.event_name || `${e.charities?.name ?? 'Charity'} sausage sizzle`;
+  const pdf = await PdfWriter.create(`Supplier sheet - ${title} - printed ${printedOn()}`);
+  pdf.title('Supplier sheet', `${title} · ${longDate(e.event_date)}`);
+
+  pdf.heading('Event');
+  pdf.row('Date', longDate(e.event_date), true);
+  pdf.row('Charity', e.charities?.name, true);
+  const s = e.bunnings_stores;
+  pdf.row('Bunnings store', [s?.location, s?.suburb, s?.state, s?.postcode].filter(Boolean).join(', '), true);
+  pdf.row('Estimated hotdogs', e.estimated_hotdogs);
+
+  const items = pickList(e);
+  pdf.heading('Items needed');
+  if (items.length > 0) {
+    pdf.table(['Item', 'Total quantity', 'Storage'], items.map(([name, v]) => [name, v.qty, v.storage ? STORAGE_LABELS[v.storage] ?? v.storage : '']), [0.55, 0.2, 0.25]);
+  } else {
+    pdf.paragraph('No packages have been recorded for this event yet, so there is no item list.');
+  }
+
+  const suppliers = e.event_suppliers.filter((x) => x.status !== 'declined');
+  pdf.heading('Supplier stores');
+  if (suppliers.length > 0) {
+    pdf.table(
+      ['Store', 'Address', 'Phone', 'Contact', 'Status'],
+      suppliers.map((x) => {
+        const sp = x.suppliers;
+        return [
+          sp ? `${sp.supplier_chain} ${sp.store_name}` : '',
+          [sp?.address, sp?.suburb, sp?.postcode].filter(Boolean).join(', '),
+          sp?.phone ?? '',
+          [sp?.contact_name, sp?.contact_mobile].filter(Boolean).join(' '),
+          label(x.status),
+        ];
+      }),
+      [0.24, 0.3, 0.14, 0.18, 0.14]
+    );
+  } else {
+    pdf.paragraph('No supplier stores have been added to this event yet.');
+  }
+  pdf.paragraph(`Questions: Vision Velocity, ${SUPPORT_EMAIL}`, 9);
+  return pdf.finish();
+}
+
 // ---------------------------------------------------------------------------
 // Emailing a document
 // ---------------------------------------------------------------------------
@@ -285,8 +396,10 @@ export async function buildRunSheetPdf(e: EventDoc, opts: RunSheetOptions): Prom
 export async function emailDocument(params: {
   recordType: 'order' | 'event';
   recordId: string;
-  document: 'order_summary' | 'run_sheet';
+  document: 'order_summary' | 'run_sheet' | 'invoice' | 'results_summary' | 'supplier_sheet';
   pdf: Uint8Array;
+  /** Further attachments (for example the order summary sent with an invoice). */
+  extraAttachments?: { filename: string; content: Uint8Array }[];
   filename: string;
   subject: string;
   intro: string;
@@ -295,21 +408,24 @@ export async function emailDocument(params: {
   note?: string | null;
   ccSelf?: boolean;
   includePrices: boolean;
-  sentBy: { type: 'admin' | 'charity'; userId: string | null; email: string | null; name?: string | null };
+  sentBy: { type: 'admin' | 'charity' | 'bunnings' | 'system'; userId: string | null; email: string | null; name?: string | null };
+  /** Replaces the default "Sent by … via the website" line. */
+  signOff?: string;
 }): Promise<{ sent: boolean; error?: string }> {
   let sent = false;
   let error: string | undefined;
   try {
     const sender = params.sentBy.name || params.sentBy.email || 'Vision Velocity';
+    const signOff = params.signOff ?? `Sent by ${sender} via the Vision Velocity website. The document is attached as a PDF.`;
     const noteHtml = params.note ? `<p style="white-space:pre-wrap;border-left:3px solid #e5e7eb;padding-left:12px">${escapeHtml(params.note)}</p>` : '';
     await sendMail({
       to: params.to,
       cc: params.ccSelf && params.sentBy.email && params.sentBy.email !== params.to ? params.sentBy.email : undefined,
       replyTo: params.sentBy.email ?? undefined,
       subject: params.subject,
-      html: emailLayout(params.subject, `<p>Hello${params.toName ? ` ${escapeHtml(params.toName)}` : ''},</p><p>${escapeHtml(params.intro)}</p>${noteHtml}<p>Sent by ${escapeHtml(sender)} via the Vision Velocity website. The document is attached as a PDF.</p>`),
-      text: `Hello${params.toName ? ` ${params.toName}` : ''},\n\n${params.intro}\n\n${params.note ? `${params.note}\n\n` : ''}Sent by ${sender} via the Vision Velocity website. The document is attached as a PDF.`,
-      attachments: [{ filename: params.filename, content: params.pdf }],
+      html: emailLayout(params.subject, `<p>Hello${params.toName ? ` ${escapeHtml(params.toName)}` : ''},</p><p>${escapeHtml(params.intro)}</p>${noteHtml}<p>${escapeHtml(signOff)}</p>`),
+      text: `Hello${params.toName ? ` ${params.toName}` : ''},\n\n${params.intro}\n\n${params.note ? `${params.note}\n\n` : ''}${signOff}`,
+      attachments: [{ filename: params.filename, content: params.pdf }, ...(params.extraAttachments ?? [])],
     });
     sent = true;
   } catch (e) {
@@ -351,4 +467,5 @@ export const emailDocumentSchema = z.object({
   note: z.string().trim().max(2000).optional().nullable(),
   cc_self: z.boolean().optional(),
   include_prices: z.boolean().optional(),
+  document: z.enum(['run_sheet', 'results_summary', 'supplier_sheet']).optional(),
 });

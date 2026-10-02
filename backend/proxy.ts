@@ -150,7 +150,8 @@ export async function proxy(request: NextRequest) {
   const isPublicOrAuth =
     pathname.startsWith('/api/public/') ||
     pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/api/bunnings/activities-officer/');
+    pathname.startsWith('/api/bunnings/activities-officer/') ||
+    pathname.startsWith('/api/cron/');
   if (isPublicOrAuth) {
     const ip = getClientIp(request);
     const result = checkRateLimit(`${ip}:${pathname}`);

@@ -10,7 +10,7 @@ export const feedbackSchema = z.object({
 });
 
 export async function submitFeedback(params: {
-  userType: 'admin' | 'charity';
+  userType: 'admin' | 'charity' | 'bunnings';
   userId: string | null;
   userEmail: string | null;
   charityName?: string | null;
@@ -37,7 +37,7 @@ export async function submitFeedback(params: {
     await sendMail({
       to: SUPPORT_EMAIL,
       replyTo: params.userEmail ?? undefined,
-      subject: `Site feedback from ${params.userType === 'charity' ? 'a charity' : 'an admin'}`,
+      subject: `Site feedback from ${params.userType === 'charity' ? 'a charity' : params.userType === 'bunnings' ? 'a Bunnings Activities Officer' : 'an admin'}`,
       html: emailLayout(
         'New feedback from the website',
         `<p><strong>From:</strong> ${escapeHtml(who)}<br><strong>Page:</strong> ${escapeHtml(params.page ?? '—')}</p>

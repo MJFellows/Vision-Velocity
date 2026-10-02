@@ -197,15 +197,17 @@ export function updateBunningsStore(id: string, input: UpdateBunningsStoreInput)
 }
 
 export interface BunningsAoMagicLink {
-  token: string;
   magicLinkUrl: string;
   activitiesOfficerEmail: string;
   expiresAt: string;
+  emailed?: boolean;
+  emailError?: string;
 }
 
 /** Generates a one-time AO portal link for this store (Task 3.2). Sending it is manual until Task 3.3's email integration exists. */
-export function generateBunningsAoMagicLink(id: string) {
-  return api.post<{ data: BunningsAoMagicLink }>(`/api/admin/bunnings/${id}/magic-link`, {});
+/** Creates a one-time sign-in link for the store's Activities Officer; with send, emails it to them. */
+export function generateBunningsAoMagicLink(id: string, send = false) {
+  return api.post<{ data: BunningsAoMagicLink }>(`/api/admin/bunnings/${id}/magic-link`, { send });
 }
 
 // ---------------------------------------------------------------------------

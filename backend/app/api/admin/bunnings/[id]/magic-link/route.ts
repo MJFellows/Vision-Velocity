@@ -1,107 +1,68 @@
-// POST /api/admin/bunnings/[id]/magic-link
-// Admin-triggered: generates a one-time magic link for the store's
-// Activities Officer to authenticate into the read-only AO portal.
-// Actually emailing the link is deferred to Task 3.3 (email templates &
-// notifications); for now this returns the token/URL so it can be sent
-// manually or wired up once email sending exists.
+/**
+ * POST /api/admin/bunnings/:id/magic-link { send?: boolean }
+ *
+ * Creates a one-time sign-in link for the store's Activities Officer (7 days).
+ * With send: true (the default from the store page) the link is emailed to the
+ * Activities Officer; the link is also returned so a founder can copy it.
+ */
 
-import { NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
-import { getSupabaseForRequest } from '@/lib/supabase';
-import { NotFoundError, ValidationError, handleApiError } from '@/utils/errors';
-import { buildCorsHeaders } from '@/utils/cors';
+import { z } from 'zod';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { json, errorResponse } from '@/lib/route-helpers';
+import { NotFoundError, ValidationError } from '@/utils/errors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction } from '@/lib/audit';
-
-const MAGIC_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+import { createAoLink } from '@/lib/bunnings-ao';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+const schema = z.object({ send: z.boolean().optional() }).nullable();
+
 export async function POST(request: Request, { params }: RouteParams) {
-  const cors = buildCorsHeaders(request.headers.get('origin'));
-  const adminEmail = request.headers.get('x-user-email') ?? 'unknown';
-  const adminUserId = request.headers.get('x-user-id');
-  const ipAddress = getClientIp(request);
-  const userAgent = request.headers.get('user-agent');
-  const { id } = await params;
-
   try {
-    const supabase = getSupabaseForRequest(request);
+    const { id } = await params;
+    if (!z.string().uuid().safeParse(id).success) throw new ValidationError('Invalid store');
+    const parsed = schema.safeParse(await request.json().catch(() => null));
+    const send = parsed.success ? parsed.data?.send === true : false;
 
-    const { data: store, error: storeError } = await supabase
+    const { data: store, error } = await getSupabaseAdmin()
       .from('bunnings_stores')
       .select('id, location, activities_officer_email, activities_officer_name, is_deleted')
       .eq('id', id)
       .maybeSingle();
-
-    if (storeError) throw storeError;
+    if (error) throw error;
     if (!store || store.is_deleted) throw new NotFoundError('Bunnings store not found');
-    if (!store.activities_officer_email) {
-      throw new ValidationError('Store has no Activities Officer email on file', {
-        activities_officer_email: 'Add an AO email to this store before generating a link',
-      });
-    }
 
-    const token = randomUUID();
-    const expiresAt = new Date(Date.now() + MAGIC_LINK_TTL_MS);
-
-    const { data: link, error: linkError } = await supabase
-      .from('bunnings_ao_magic_links')
-      .insert({
-        token,
-        bunnings_store_id: store.id,
-        activities_officer_email: store.activities_officer_email,
-        expires_at: expiresAt.toISOString(),
-      })
-      .select()
-      .single();
-
-    if (linkError) throw linkError;
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
-    const magicLinkUrl = `${appUrl}/bunnings/activities-officer/auth?token=${token}`;
-
+    const link = await createAoLink(store, { send });
     await logAdminAction({
-      adminUserId,
-      userEmail: adminEmail,
-      action: 'generated_bunnings_ao_magic_link',
-      description: `Generated AO magic link for "${store.location}" (${store.activities_officer_email})`,
+      adminUserId: request.headers.get('x-user-id'),
+      userEmail: request.headers.get('x-user-email') ?? 'unknown',
+      action: send ? (link.emailed ? 'emailed_bunnings_ao_link' : 'email_bunnings_ao_link_failed') : 'generated_bunnings_ao_magic_link',
+      description: `Activities Officer link for "${store.location}" (${store.activities_officer_email})`,
       entityType: 'bunnings_stores',
       entityId: store.id,
-      changes: { before: null, after: { magic_link_id: link.id, expires_at: link.expires_at } },
-      ipAddress,
-      userAgent,
+      ipAddress: getClientIp(request),
+      userAgent: request.headers.get('user-agent'),
+      status: send && !link.emailed ? 'error' : 'success',
+      errorDetail: link.emailError ?? null,
     });
 
-    return NextResponse.json(
+    return json(
+      request,
       {
         data: {
-          token,
-          magicLinkUrl,
+          magicLinkUrl: link.url,
           activitiesOfficerEmail: store.activities_officer_email,
-          expiresAt: expiresAt.toISOString(),
+          expiresAt: link.expiresAt,
+          emailed: link.emailed,
+          emailError: link.emailError,
         },
       },
-      { status: 201, headers: cors }
+      201
     );
   } catch (error) {
-    if (!(error instanceof ValidationError) && !(error instanceof NotFoundError)) {
-      await logAdminAction({
-        adminUserId,
-        userEmail: adminEmail,
-        action: 'generate_bunnings_ao_magic_link_failed',
-        entityType: 'bunnings_stores',
-        entityId: id,
-        ipAddress,
-        userAgent,
-        status: 'error',
-        errorDetail: error instanceof Error ? error.message : String(error),
-      });
-    }
-    const res = handleApiError(error);
-    for (const [k, v] of Object.entries(cors)) res.headers.set(k, v as string);
-    return res;
+    return errorResponse(request, error);
   }
 }

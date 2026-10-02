@@ -50,6 +50,8 @@ export interface CharityOrder {
   total_price_aud: number;
   created_at: string;
   packages: { name: string; description: string | null } | null;
+  /** Present on the single-order view once an invoice has been issued. */
+  invoice?: { invoice_number: string; issue_date: string; due_date: string; amount_aud: number; status: 'issued' | 'paid'; paid_at: string | null } | null;
 }
 
 export interface CharityPerson {

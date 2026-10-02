@@ -8,7 +8,7 @@ import { GLOSSARY, GUIDES } from '@/lib/help-content';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
-export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity'; base: string }) {
+export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity' | 'bunnings'; base: string }) {
   const [q, setQ] = useState('');
   const guides = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -46,7 +46,7 @@ export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity'; 
               <CardTitle>What the words mean</CardTitle>
             </CardHeader>
             <dl className="space-y-3 text-sm">
-              {GLOSSARY.filter((g) => audience === 'admin' || !['Head-office negotiations', 'Component', 'Possible / Declined'].includes(g.term)).map((g) => (
+              {GLOSSARY.filter((g) => audience === 'admin' || !['Head-office negotiations', 'Component', 'Possible / Declined', 'Invoice'].includes(g.term)).map((g) => (
                 <div key={g.term}>
                   <dt className="font-medium text-navy">{g.term}</dt>
                   <dd className="text-charcoal/70">{g.meaning}</dd>
@@ -54,6 +54,7 @@ export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity'; 
               ))}
             </dl>
           </Card>
+          {audience !== 'bunnings' && (
           <Card>
             <CardHeader>
               <CardTitle>Welcome tour</CardTitle>
@@ -63,6 +64,7 @@ export function HelpCentre({ audience, base }: { audience: 'admin' | 'charity'; 
               Replay the tour
             </Button>
           </Card>
+          )}
         </div>
       </div>
     </>

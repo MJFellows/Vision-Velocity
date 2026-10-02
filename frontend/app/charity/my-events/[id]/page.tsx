@@ -166,6 +166,16 @@ function EventDetail() {
           />
         </div>
       )}
+
+      {(event.actual_hotdogs_sold != null || event.number_of_sales != null || event.sales_value_aud != null) && (
+        <RecordActions
+          title="Results summary"
+          documentPath={`/api/charity/events/${event.id}/results-summary`}
+          emailPath={`/api/charity/events/${event.id}/email`}
+          emailExtra={{ document: 'results_summary' }}
+          filename={`Results-${event.event_date}.pdf`}
+        />
+      )}
     </>
   );
 }

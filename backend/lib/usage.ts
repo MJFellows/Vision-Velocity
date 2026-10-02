@@ -23,7 +23,7 @@ export const usageBatchSchema = z.object({
 });
 
 export async function recordUsage(
-  userType: 'admin' | 'charity',
+  userType: 'admin' | 'charity' | 'bunnings',
   userId: string | null,
   events: z.infer<typeof usageBatchSchema>['events']
 ): Promise<void> {

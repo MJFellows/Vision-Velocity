@@ -1,0 +1,24 @@
+/** GET — the event's results summary as a PDF (admin). */
+
+import { z } from 'zod';
+import { corsFor, errorResponse } from '@/lib/route-helpers';
+import { loadEventDoc, pdfResponseHeaders } from '@/lib/documents';
+import { buildEventDocument } from '@/lib/event-documents';
+import { NotFoundError, ValidationError } from '@/utils/errors';
+
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+export async function GET(request: Request, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    if (!z.string().uuid().safeParse(id).success) throw new ValidationError('Invalid event id');
+    const event = await loadEventDoc(id);
+    if (!event) throw new NotFoundError('Event not found');
+    const doc = await buildEventDocument(event, 'results_summary', { includePrices: false, audience: 'admin' });
+    return new Response(Buffer.from(doc.pdf), { headers: pdfResponseHeaders(doc.filename, corsFor(request)) });
+  } catch (error) {
+    return errorResponse(request, error);
+  }
+}

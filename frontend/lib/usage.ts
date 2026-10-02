@@ -19,6 +19,7 @@ interface UsageEvent {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 let endpoint: string | null = null;
+let tokenGetter: () => string | null = getStoredToken;
 let queue: UsageEvent[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -34,13 +35,15 @@ function currentPage(): string {
   return typeof window === 'undefined' ? '' : window.location.pathname;
 }
 
-export function setUsageEndpoint(path: string | null) {
+/** Sets where usage is sent, and (for the Bunnings area) how to find the sign-in token. */
+export function setUsageEndpoint(path: string | null, getToken: () => string | null = getStoredToken) {
   endpoint = path;
+  tokenGetter = getToken;
 }
 
 export function flushUsage(keepalive = false) {
   if (!endpoint || queue.length === 0) return;
-  const token = getStoredToken();
+  const token = tokenGetter();
   if (!token) {
     queue = [];
     return;

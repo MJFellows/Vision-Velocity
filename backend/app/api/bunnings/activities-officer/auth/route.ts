@@ -1,109 +1,61 @@
-// GET /api/bunnings/activities-officer/auth?token=...
-// Public route: verifies a one-time magic link (sent to a Bunnings
-// Activities Officer) and issues a short-lived AO session token. There is
-// no Supabase Auth session for an AO — they never sign up — so this
-// deliberately uses the service-role client rather than
-// getSupabaseForRequest(): an anonymous caller has no JWT for RLS to key
-// off, and this table's only RLS policy is admin-only.
+/**
+ * GET /api/bunnings/activities-officer/auth?token=…
+ *
+ * Public: checks a one-time link emailed to a Bunnings Activities Officer,
+ * marks it used and returns a 7-day AO session token. AOs have no Supabase
+ * Auth account, so this uses the service-role client (the links table is
+ * admin-only under row-level security). See lib/bunnings-ao.ts.
+ */
 
-import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { SignJWT } from 'jose';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { ValidationError, InternalServerError, handleApiError } from '@/utils/errors';
-import { buildCorsHeaders } from '@/utils/cors';
+import { json, errorResponse } from '@/lib/route-helpers';
+import { ValidationError } from '@/utils/errors';
+import { AO_SESSION_TTL_SECONDS, signAoSession } from '@/lib/bunnings-ao';
 
-const authSchema = z.object({
-  token: z.string().uuid('Invalid token format'),
-});
+const USED_OR_EXPIRED = 'This link has already been used or has expired. Request a new link below.';
 
-const AO_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
-
-function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new InternalServerError('Missing JWT_SECRET — cannot issue AO session token');
-  }
-  return new TextEncoder().encode(secret);
-}
-
-export async function GET(request: NextRequest) {
-  const cors = buildCorsHeaders(request.headers.get('origin'));
+export async function GET(request: Request) {
   try {
-    const token = request.nextUrl.searchParams.get('token');
+    const token = new URL(request.url).searchParams.get('token');
+    if (!z.string().uuid().safeParse(token).success) throw new ValidationError('This link is incomplete. Request a new link below.');
 
-    const parsed = authSchema.safeParse({ token });
-    if (!parsed.success) {
-      throw new ValidationError(
-        'Invalid or missing token',
-        Object.fromEntries(parsed.error.issues.map((i) => [i.path.join('.'), i.message]))
-      );
-    }
-
-    const supabase = getSupabaseAdmin();
-
-    const { data: link, error: linkError } = await supabase
+    const admin = getSupabaseAdmin();
+    const { data: link, error } = await admin
       .from('bunnings_ao_magic_links')
-      .select('id, token, bunnings_store_id, activities_officer_email, expires_at, used_at')
-      .eq('token', parsed.data.token)
+      .select('id, bunnings_store_id, activities_officer_email, expires_at, used_at')
+      .eq('token', token)
       .maybeSingle();
+    if (error) throw error;
+    if (!link || link.used_at || new Date(link.expires_at) < new Date()) throw new ValidationError(USED_OR_EXPIRED);
 
-    if (linkError) throw linkError;
-    if (!link) {
-      throw new ValidationError('Magic link not found', { token: 'This link does not exist' });
-    }
-    if (link.used_at) {
-      throw new ValidationError('Magic link already used', {
-        token: 'This link has already been used. Ask Vision Velocity for a new one.',
-      });
-    }
-    if (new Date(link.expires_at) < new Date()) {
-      throw new ValidationError('Magic link expired', {
-        token: 'This link has expired. Ask Vision Velocity for a new one.',
-      });
-    }
-
-    const { data: store, error: storeError } = await supabase
-      .from('bunnings_stores')
-      .select('id, location, activities_officer_name')
-      .eq('id', link.bunnings_store_id)
-      .maybeSingle();
-
-    if (storeError) throw storeError;
-    if (!store) throw new InternalServerError('Store for this magic link no longer exists');
-
-    const { error: updateError } = await supabase
+    // Mark used only if nobody else has (one-time link).
+    const { data: claimed, error: claimError } = await admin
       .from('bunnings_ao_magic_links')
       .update({ used_at: new Date().toISOString() })
-      .eq('id', link.id);
-    if (updateError) throw updateError;
+      .eq('id', link.id)
+      .is('used_at', null)
+      .select('id');
+    if (claimError) throw claimError;
+    if (!claimed || claimed.length === 0) throw new ValidationError(USED_OR_EXPIRED);
 
-    const sessionToken = await new SignJWT({
-      type: 'bunnings_ao',
+    const { data: store, error: storeError } = await admin
+      .from('bunnings_stores')
+      .select('id, location, activities_officer_name, is_deleted')
+      .eq('id', link.bunnings_store_id)
+      .maybeSingle();
+    if (storeError) throw storeError;
+    if (!store || store.is_deleted) throw new ValidationError('This store is no longer listed. Please contact Vision Velocity.');
+
+    const sessionToken = await signAoSession({
       bunningsStoreId: store.id,
       aoEmail: link.activities_officer_email,
       aoName: store.activities_officer_name,
-    })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime(`${AO_SESSION_TTL_SECONDS}s`)
-      .sign(getJwtSecret());
-
-    return NextResponse.json(
-      {
-        data: {
-          sessionToken,
-          storeId: store.id,
-          storeName: store.location,
-          aoName: store.activities_officer_name,
-          expiresIn: AO_SESSION_TTL_SECONDS,
-        },
-      },
-      { status: 200, headers: cors }
-    );
+    });
+    return json(request, {
+      data: { sessionToken, storeId: store.id, storeName: store.location, aoName: store.activities_officer_name, expiresIn: AO_SESSION_TTL_SECONDS },
+    });
   } catch (error) {
-    const res = handleApiError(error);
-    for (const [k, v] of Object.entries(cors)) res.headers.set(k, v as string);
-    return res;
+    return errorResponse(request, error);
   }
 }

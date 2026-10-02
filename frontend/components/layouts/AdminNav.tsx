@@ -10,6 +10,7 @@ export const navItems = [
   { href: '/admin/events', label: 'Events' },
   { href: '/admin/charities', label: 'Charities' },
   { href: '/admin/orders', label: 'Orders' },
+  { href: '/admin/invoices', label: 'Invoices' },
   { href: '/admin/packages', label: 'Packages' },
   { href: '/admin/components', label: 'Components' },
   { href: '/admin/bunnings', label: 'Bunnings stores' },

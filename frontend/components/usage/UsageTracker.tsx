@@ -9,12 +9,12 @@ import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { flushUsage, labelFor, setUsageEndpoint, trackUsage } from '@/lib/usage';
 
-export function UsageTracker({ endpoint }: { endpoint: string }) {
+export function UsageTracker({ endpoint, getToken }: { endpoint: string; getToken?: () => string | null }) {
   const pathname = usePathname();
   const dirtyForms = useRef(new Set<string>());
 
   useEffect(() => {
-    setUsageEndpoint(endpoint);
+    setUsageEndpoint(endpoint, getToken);
     const formName = (form: HTMLFormElement | null) => form?.getAttribute('data-form') || form?.getAttribute('aria-label') || 'form';
 
     const onClick = (e: MouseEvent) => {
@@ -47,7 +47,7 @@ export function UsageTracker({ endpoint }: { endpoint: string }) {
       document.removeEventListener('visibilitychange', onHide);
       flushUsage(true);
     };
-  }, [endpoint]);
+  }, [endpoint, getToken]);
 
   useEffect(() => {
     trackUsage('page_view');

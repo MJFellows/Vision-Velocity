@@ -260,6 +260,7 @@ export default function EventDetailPage() {
         filename={`Run-sheet-${event.event_date}.pdf`}
         allowPrices
         historyFor={{ type: 'event', id: event.id }}
+        historyDocument="run_sheet"
         extra={
           <Button
             type="button"
@@ -279,6 +280,28 @@ export default function EventDetailPage() {
           </Button>
         }
       />
+
+      <RecordActions
+        title="Supplier sheet"
+        documentPath={`/api/admin/events/${event.id}/supplier-sheet`}
+        emailPath={`/api/admin/events/${event.id}/email`}
+        emailExtra={{ document: 'supplier_sheet' }}
+        filename={`Supplier-sheet-${event.event_date}.pdf`}
+        historyFor={{ type: 'event', id: event.id }}
+        historyDocument="supplier_sheet"
+      />
+
+      {(event.actual_hotdogs_sold != null || event.number_of_sales != null || event.sales_value_aud != null) && (
+        <RecordActions
+          title="Results summary"
+          documentPath={`/api/admin/events/${event.id}/results-summary`}
+          emailPath={`/api/admin/events/${event.id}/email`}
+          emailExtra={{ document: 'results_summary' }}
+          filename={`Results-${event.event_date}.pdf`}
+          historyFor={{ type: 'event', id: event.id }}
+          historyDocument="results_summary"
+        />
+      )}
 
       <Card className="mb-6 max-w-2xl">
         <CardHeader>

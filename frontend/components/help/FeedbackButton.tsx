@@ -7,7 +7,16 @@ import { usePathname } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 
-export function FeedbackButton({ endpoint, label = 'Feedback' }: { endpoint: string; label?: string }) {
+export function FeedbackButton({
+  endpoint,
+  label = 'Feedback',
+  send,
+}: {
+  endpoint: string;
+  label?: string;
+  /** Custom sender (the Bunnings area uses its own sign-in token). */
+  send?: (body: { page: string | null; message: string }) => Promise<unknown>;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -21,7 +30,8 @@ export function FeedbackButton({ endpoint, label = 'Feedback' }: { endpoint: str
     setSending(true);
     setError(null);
     try {
-      await api.post(endpoint, { page: pathname, message: message.trim() });
+      if (send) await send({ page: pathname, message: message.trim() });
+      else await api.post(endpoint, { page: pathname, message: message.trim() });
       setDone(true);
       setMessage('');
     } catch (err) {

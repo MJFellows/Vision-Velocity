@@ -5,6 +5,7 @@ import { ValidationError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction } from '@/lib/audit';
+import { sendOrderReceivedEmail, type AutoEmailResult } from '@/lib/order-emails';
 
 const createOrderSchema = z.object({
   charity_id: z.string().uuid(),
@@ -15,6 +16,8 @@ const createOrderSchema = z.object({
   delivery_phone: z.string().optional().nullable(),
   special_requests: z.string().optional().nullable(),
   total_price_aud: z.number().nonnegative(),
+  /** Email the charity the order summary (default yes). Not stored. */
+  notify_charity: z.boolean().optional(),
 });
 
 export async function GET(request: Request) {
@@ -79,10 +82,11 @@ export async function POST(request: Request) {
       throw new ValidationError('Event date cannot be in the past', { event_date: 'must be today or later' });
     }
 
+    const { notify_charity: notifyCharity = true, ...orderFields } = parsed.data;
     const supabase = getSupabaseForRequest(request);
     const { data, error } = await supabase
       .from('orders')
-      .insert(parsed.data)
+      .insert(orderFields)
       .select()
       .single();
 
@@ -95,14 +99,22 @@ export async function POST(request: Request) {
       description: `Created order for event ${data.event_date}`,
       entityType: 'orders',
       entityId: data.id,
-      changes: { before: null, after: parsed.data },
+      changes: { before: null, after: orderFields },
       requestParams: parsed.data,
       recordIds: [data.id],
       ipAddress,
       userAgent,
     });
 
-    return NextResponse.json({ data }, { status: 201, headers: cors });
+    let autoEmail: AutoEmailResult = { status: 'skipped', detail: 'Not requested' };
+    if (notifyCharity) {
+      autoEmail = await sendOrderReceivedEmail(data.id).catch((e: unknown) => ({
+        status: 'failed' as const,
+        detail: e instanceof Error ? e.message : String(e),
+      }));
+    }
+
+    return NextResponse.json({ data, autoEmail }, { status: 201, headers: cors });
   } catch (error) {
     if (!(error instanceof ValidationError)) {
       await logAdminAction({

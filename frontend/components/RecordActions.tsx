@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 interface SentEmail {
   id: string;
   created_at: string;
+  document?: string;
   recipient_email: string;
   recipient_name: string | null;
   sent_by_email: string | null;
@@ -30,6 +31,8 @@ export function RecordActions({
   filename,
   allowPrices = false,
   historyFor,
+  historyDocument,
+  emailExtra,
   extra,
 }: {
   title: string;
@@ -40,6 +43,10 @@ export function RecordActions({
   allowPrices?: boolean;
   /** Admin only: shows emails already sent for this record. */
   historyFor?: { type: 'order' | 'event'; id: string };
+  /** Only list emails of this document type in the history (for example 'run_sheet'). */
+  historyDocument?: string;
+  /** Extra fields sent with the email request (for example { document: 'results_summary' }). */
+  emailExtra?: Record<string, unknown>;
   extra?: React.ReactNode;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
@@ -62,11 +69,11 @@ export function RecordActions({
     if (!historyType || !historyId) return;
     try {
       const res = await api.get<{ data: SentEmail[] }>('/api/admin/record-emails', { record_type: historyType, record_id: historyId });
-      setHistory(res.data);
+      setHistory(historyDocument ? res.data.filter((h) => !h.document || h.document === historyDocument) : res.data);
     } catch {
       // History is optional; leave it empty if it cannot be loaded.
     }
-  }, [historyType, historyId]);
+  }, [historyType, historyId, historyDocument]);
 
   useEffect(() => {
     loadHistory();
@@ -105,6 +112,7 @@ export function RecordActions({
         note: note.trim() || null,
         cc_self: ccSelf,
         include_prices: allowPrices ? includePrices : undefined,
+        ...(emailExtra ?? {}),
       });
       setMessage(`Sent to ${to.trim()}.`);
       setShowEmail(false);
@@ -181,7 +189,7 @@ export function RecordActions({
               <li key={h.id}>
                 {new Date(h.created_at).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })} — to{' '}
                 {h.recipient_name ? `${h.recipient_name} (${h.recipient_email})` : h.recipient_email}
-                {h.sent_by_email ? ` by ${h.sent_by_email}${h.sent_by_type === 'charity' ? ' (charity)' : ''}` : ''}
+                {h.sent_by_type === 'system' ? ' automatically' : h.sent_by_email ? ` by ${h.sent_by_email}${h.sent_by_type === 'charity' ? ' (charity)' : ''}` : ''}
                 {h.status === 'failed' ? ' — failed' : ''}
               </li>
             ))}

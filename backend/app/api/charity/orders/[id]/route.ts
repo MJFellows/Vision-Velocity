@@ -25,7 +25,14 @@ export async function GET(request: Request, { params }: RouteParams) {
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new NotFoundError('Order not found');
-    return json(request, { data });
+    const { data: invoice } = await getSupabaseAdmin()
+      .from('invoices')
+      .select('invoice_number, issue_date, due_date, amount_aud, status, paid_at')
+      .eq('order_id', id)
+      .eq('charity_id', caller.charityId)
+      .neq('status', 'void')
+      .maybeSingle();
+    return json(request, { data: { ...data, invoice: invoice ?? null } });
   } catch (error) {
     return errorResponse(request, error);
   }

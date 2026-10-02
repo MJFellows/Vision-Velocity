@@ -25,6 +25,7 @@ interface Today {
   upcomingEventsWithGaps: Item[];
   ordersNeedingAttention: Item[];
   eventsMissingResults: Item[];
+  overdueInvoices?: { id: string; invoice_number: string; due_date: string; amount_aud: number; order_id: string; charity: string | null }[];
   newFeedback: number;
 }
 
@@ -80,6 +81,7 @@ export function TodayPanel() {
       data.upcomingEventsWithGaps.length +
       data.ordersNeedingAttention.length +
       data.eventsMissingResults.length +
+      (data.overdueInvoices?.length ?? 0) +
       (data.newFeedback > 0 ? 1 : 0)
     : 0;
 
@@ -117,6 +119,16 @@ export function TodayPanel() {
             <Section title="Past events with no results entered" count={data.eventsMissingResults.length}>
               {data.eventsMissingResults.map((e) => (
                 <Row key={e.id} href={`/admin/events/${e.id}`} main={`${shortDate(e.event_date)} · ${e.name || e.charity || 'Event'}`} sub={e.store ?? undefined} />
+              ))}
+            </Section>
+            <Section title="Overdue invoices" count={data.overdueInvoices?.length ?? 0}>
+              {(data.overdueInvoices ?? []).map((i) => (
+                <Row
+                  key={i.id}
+                  href={`/admin/orders/${i.order_id}`}
+                  main={`${i.invoice_number} · ${i.charity ?? 'Charity'}`}
+                  sub={`${Number(i.amount_aud).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })} — was due ${shortDate(i.due_date)}`}
+                />
               ))}
             </Section>
             {data.newFeedback > 0 && (

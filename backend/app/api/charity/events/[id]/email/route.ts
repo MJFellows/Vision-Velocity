@@ -1,10 +1,11 @@
-/** POST /api/charity/events/:id/email { to, to_name?, note?, cc_self? } — emails the charity's run sheet copy. */
+/** POST /api/charity/events/:id/email { to, to_name?, note?, cc_self? } — emails the charity's run sheet copy (or, with document: 'results_summary', its results summary). */
 
 import { z } from 'zod';
 import { json, errorResponse, parseBody } from '@/lib/route-helpers';
 import { requireCharityCaller } from '@/lib/charity-auth';
 import { NotFoundError, ValidationError } from '@/utils/errors';
-import { buildRunSheetPdf, emailDocument, emailDocumentSchema, loadEventDoc, longDate, safeFilename } from '@/lib/documents';
+import { emailDocument, emailDocumentSchema, loadEventDoc } from '@/lib/documents';
+import { buildEventDocument } from '@/lib/event-documents';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -18,16 +19,16 @@ export async function POST(request: Request, { params }: RouteParams) {
     const body = await parseBody(request, emailDocumentSchema, 'Invalid email request');
     const event = await loadEventDoc(id, caller.charityId);
     if (!event) throw new NotFoundError('Event not found');
-    const pdf = await buildRunSheetPdf(event, { includePrices: false, audience: 'charity' });
-    const title = event.event_name || `${caller.charityName} sausage sizzle`;
+    const kind = body.document === 'results_summary' ? 'results_summary' : 'run_sheet';
+    const doc = await buildEventDocument(event, kind, { includePrices: false, audience: 'charity' });
     const result = await emailDocument({
       recordType: 'event',
       recordId: id,
-      document: 'run_sheet',
-      pdf,
-      filename: `Run-sheet-${event.event_date}-${safeFilename(event.event_name || caller.charityName)}.pdf`,
-      subject: `Run sheet: ${title}, ${longDate(event.event_date)}`,
-      intro: `Please find attached the run sheet for ${title} at ${event.bunnings_stores?.location ?? 'Bunnings'} on ${longDate(event.event_date)}.`,
+      document: kind,
+      pdf: doc.pdf,
+      filename: doc.filename,
+      subject: doc.subject,
+      intro: doc.intro,
       to: body.to,
       toName: body.to_name,
       note: body.note,

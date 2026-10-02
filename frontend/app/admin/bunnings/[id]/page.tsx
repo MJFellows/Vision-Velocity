@@ -58,7 +58,7 @@ export default function BunningsStoreDetailPage() {
   const [panelRadius, setPanelRadius] = useState<NearbyRadiusKm>(0);
   const [panelOrigin, setPanelOrigin] = useState<boolean | null>(null);
   const [panelSections, setPanelSections] = useState<PanelSection[]>([]);
-  const [magicLink, setMagicLink] = useState<{ magicLinkUrl: string; activitiesOfficerEmail: string; expiresAt: string } | null>(null);
+  const [magicLink, setMagicLink] = useState<{ magicLinkUrl: string; activitiesOfficerEmail: string; expiresAt: string; emailed?: boolean; emailError?: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -139,14 +139,14 @@ export default function BunningsStoreDetailPage() {
     }
   };
 
-  const handleGenerateMagicLink = async () => {
+  const handleGenerateMagicLink = async (send: boolean) => {
     setIsGeneratingLink(true);
     setError(null);
     try {
-      const { data } = await generateBunningsAoMagicLink(id);
+      const { data } = await generateBunningsAoMagicLink(id, send);
       setMagicLink(data);
     } catch {
-      setError('Could not generate a magic link — check the store has an AO email set.');
+      setError('Could not create a sign-in link — check the store has an Activities Officer email.');
     } finally {
       setIsGeneratingLink(false);
     }
@@ -334,26 +334,33 @@ export default function BunningsStoreDetailPage() {
 
       <Card className="mb-6 max-w-lg">
         <CardHeader>
-          <CardTitle>Activities Officer portal</CardTitle>
+          <CardTitle>Activities Officer access</CardTitle>
         </CardHeader>
-        <p className="mb-3 text-sm text-charcoal/60">
-          Generate a one-time link so this store's Activities Officer can view upcoming events (read-only). Sending it by email is manual for now — Task 3.3 will automate that.
+        <p className="mb-3 text-sm text-charcoal/70">
+          The store&apos;s Activities Officer can see the events at this store (no prices), print run sheets and update their own contact details.
+          They sign in with a link that works once and lasts 7 days, and can ask for a new one themselves at /bunnings/activities-officer/sign-in.
         </p>
-        <Button
-          variant="outline"
-          onClick={handleGenerateMagicLink}
-          isLoading={isGeneratingLink}
-          disabled={!store.activities_officer_email}
-        >
-          Generate magic link
-        </Button>
-        {!store.activities_officer_email && (
-          <p className="mt-2 text-xs text-charcoal/50">Add an AO email above first.</p>
-        )}
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => handleGenerateMagicLink(true)} isLoading={isGeneratingLink} disabled={!store.activities_officer_email}>
+            Email sign-in link
+          </Button>
+          <Button variant="outline" onClick={() => handleGenerateMagicLink(false)} disabled={isGeneratingLink || !store.activities_officer_email}>
+            Show link to copy
+          </Button>
+        </div>
+        {!store.activities_officer_email && <p className="mt-2 text-xs text-charcoal/60">Add the Activities Officer&apos;s email above first.</p>}
         {magicLink && (
           <div className="mt-4 rounded-card bg-grey/50 p-3 text-sm">
-            <p className="mb-1 text-charcoal/70">For {magicLink.activitiesOfficerEmail} — expires {new Date(magicLink.expiresAt).toLocaleDateString('en-AU')}:</p>
-            <p className="break-all font-mono text-xs text-navy">{magicLink.magicLinkUrl}</p>
+            {magicLink.emailed && <p className="mb-1 text-green-700">Emailed to {magicLink.activitiesOfficerEmail}.</p>}
+            {magicLink.emailError && <p className="mb-1 text-red-600">The email could not be sent: {magicLink.emailError}</p>}
+            {!magicLink.emailed && (
+              <>
+                <p className="mb-1 text-charcoal/70">
+                  Link for {magicLink.activitiesOfficerEmail} — works once, expires {new Date(magicLink.expiresAt).toLocaleDateString('en-AU')}:
+                </p>
+                <p className="break-all font-mono text-xs text-navy">{magicLink.magicLinkUrl}</p>
+              </>
+            )}
           </div>
         )}
       </Card>

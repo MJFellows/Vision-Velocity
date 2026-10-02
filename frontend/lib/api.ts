@@ -71,7 +71,7 @@ export class ApiRequestError extends Error {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   query?: Record<string, string | number | boolean | undefined>;
   /** Skip attaching the Authorization header — only needed for the public/auth endpoints. */
@@ -181,6 +181,7 @@ export const api = {
     request<T>(path, { method: 'GET', query, skipAuth }),
   post: <T>(path: string, body?: unknown, skipAuth = false) =>
     request<T>(path, { method: 'POST', body, skipAuth }),
+  put: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PUT', body }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };

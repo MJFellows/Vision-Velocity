@@ -52,7 +52,7 @@ function CountList({ items, empty = 'Nothing recorded yet.' }: { items: Count[];
   );
 }
 
-const TYPE_LABEL: Record<string, string> = { admin: 'Founders / admins', charity: 'Charities' };
+const TYPE_LABEL: Record<string, string> = { admin: 'Founders / admins', charity: 'Charities', bunnings: 'Bunnings Activities Officers' };
 
 export default function UsageReportPage() {
   const [days, setDays] = useState('30');
