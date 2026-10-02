@@ -7,6 +7,7 @@ import { StatCard } from '@/components/ui/StatCard';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth';
 import { listCharities, listEvents, listOrders, listBunningsStores } from '@/lib/adminApi';
+import { TodayPanel } from '@/components/TodayPanel';
 
 /** YYYY-MM-DD in the browser's local time zone (toISOString would shift to UTC). */
 function localDate(d: Date): string {
@@ -95,11 +96,13 @@ export default function AdminDashboardPage() {
       <h1 className="mb-1">Hi {firstName}, what would you like to do?</h1>
       <p className="mb-6 text-sm text-charcoal/60">Here&apos;s where things stand today.</p>
 
+      <TodayPanel />
+
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard label="Charities" value={String(stats?.totalCharities ?? '')} isLoading={!stats} />
-        <StatCard label="Trial charities" value={String(stats?.trialCharities ?? '')} isLoading={!stats} />
+        <StatCard label="Awaiting approval" value={String(stats?.trialCharities ?? '')} isLoading={!stats} />
         <StatCard label="Events this week" value={String(stats?.eventsThisWeek ?? '')} isLoading={!stats} />
         <StatCard label="Bunnings stores" value={String(stats?.bunningsStores ?? '')} isLoading={!stats} />
       </div>
@@ -112,30 +115,23 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <Link href="/admin/charities">
+      <div className="mt-8 grid gap-3 grid-cols-2 lg:grid-cols-4">
+        <Link href="/admin/events/new">
+          <Button className="w-full">+ New event</Button>
+        </Link>
+        <Link href="/admin/orders/new">
           <Button variant="outline" className="w-full">
-            View Charities
+            + New order
           </Button>
         </Link>
-        <Link href="/admin/orders">
+        <Link href="/admin/charities/new">
           <Button variant="outline" className="w-full">
-            View Orders
+            + New charity
           </Button>
         </Link>
-        <Link href="/admin/bunnings">
+        <Link href="/admin/help">
           <Button variant="outline" className="w-full">
-            View Bunnings Stores
-          </Button>
-        </Link>
-        <Link href="/admin/suppliers">
-          <Button variant="outline" className="w-full">
-            View Suppliers
-          </Button>
-        </Link>
-        <Link href="/admin/supplier-status">
-          <Button variant="outline" className="w-full">
-            Supplier Status
+            Help
           </Button>
         </Link>
       </div>

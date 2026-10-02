@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
+import { downloadCsv } from '@/lib/exporting';
+import { statusLabel } from '@/lib/labels';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
@@ -58,9 +60,24 @@ export default function AdminEventsPage() {
     <AdminLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1>Events</h1>
-        <Link href="/admin/events/new">
-          <Button>Add event</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            disabled={events.length === 0}
+            onClick={() =>
+              downloadCsv(
+                'events.csv',
+                ['Date', 'Event name', 'Status', 'Charity', 'Bunnings store', 'Estimated hotdogs', 'Staff', 'Shifts', 'Hotdogs sold', 'Number of sales', 'Value of sales'],
+                events.map((e) => [e.event_date, e.event_name ?? '', statusLabel(e.status), e.charities?.name ?? '', e.bunnings_stores?.location ?? '', e.estimated_hotdogs ?? '', e.estimated_staff ?? '', e.number_of_shifts ?? '', e.actual_hotdogs_sold ?? '', e.number_of_sales ?? '', e.sales_value_aud ?? ''])
+              )
+            }
+          >
+            Download spreadsheet
+          </Button>
+          <Link href="/admin/events/new">
+            <Button>+ New event</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
@@ -83,7 +100,7 @@ export default function AdminEventsPage() {
       </p>
 
       {!isLoading && events.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No events match these filters.</p>
+        <p className="text-sm text-charcoal/60">No events match these filters. Events are the sausage sizzles themselves — <Link href="/admin/events/new" className="text-accent underline">add one</Link>, or clear the filters.</p>
       ) : (
         <div className="space-y-3">
           {events.map((ev) => {

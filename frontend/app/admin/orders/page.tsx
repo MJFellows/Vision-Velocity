@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
+import { downloadCsv } from '@/lib/exporting';
+import { statusLabel } from '@/lib/labels';
 import { Card } from '@/components/ui/Card';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
@@ -37,9 +39,24 @@ export default function AdminOrdersPage() {
     <AdminLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1>Orders</h1>
-        <Link href="/admin/orders/new">
-          <Button>+ New order</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            disabled={orders.length === 0}
+            onClick={() =>
+              downloadCsv(
+                'orders.csv',
+                ['Event date', 'Charity', 'Package', 'Status', 'Total price', 'Delivery address', 'Delivery contact', 'Delivery phone'],
+                orders.map((o) => [o.event_date, o.charities?.name ?? '', o.packages?.name ?? '', statusLabel(o.status), o.total_price_aud, o.delivery_address, o.delivery_contact_name ?? '', o.delivery_phone ?? ''])
+              )
+            }
+          >
+            Download spreadsheet
+          </Button>
+          <Link href="/admin/orders/new">
+            <Button>+ New order</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4 sm:w-48">
@@ -62,7 +79,7 @@ export default function AdminOrdersPage() {
       {isLoading ? (
         <p className="text-sm text-charcoal/60">Loading…</p>
       ) : orders.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No orders found.</p>
+        <p className="text-sm text-charcoal/60">No orders yet. An order records what a charity has asked for (a package, delivery details and price). <Link href="/admin/orders/new" className="text-accent underline">Create the first order</Link> — you need at least one active package.</p>
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (

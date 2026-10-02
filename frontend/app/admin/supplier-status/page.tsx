@@ -66,7 +66,7 @@ export default function AdminSupplierStatusPage() {
 
   return (
     <AdminLayout>
-      <h1 className="mb-6">Supplier status</h1>
+      <h1 className="mb-6">Head-office negotiations</h1>
 
       <div className="mb-6 max-w-xs">
         <Select

@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
+import { downloadCsv } from '@/lib/exporting';
+import { statusLabel } from '@/lib/labels';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -44,9 +46,24 @@ export default function AdminCharitiesPage() {
     <AdminLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1>Charities</h1>
-        <Link href="/admin/charities/new">
-          <Button>+ Add</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            disabled={charities.length === 0}
+            onClick={() =>
+              downloadCsv(
+                'charities.csv',
+                ['Name', 'Status', 'Contact', 'Email', 'Phone', 'Postcode', 'Location', 'Signed up'],
+                charities.map((c) => [c.name, statusLabel(c.subscription_status), c.contact_name ?? '', c.email ?? '', c.phone ?? '', c.postcode ?? '', c.location ?? '', c.created_at.slice(0, 10)])
+              )
+            }
+          >
+            Download spreadsheet
+          </Button>
+          <Link href="/admin/charities/new">
+            <Button>+ New charity</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row">
@@ -59,8 +76,8 @@ export default function AdminCharitiesPage() {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             options={[
-              { value: 'trial', label: 'Trial' },
-              { value: 'active', label: 'Active' },
+              { value: 'trial', label: 'Awaiting approval' },
+              { value: 'active', label: 'Approved' },
               { value: 'inactive', label: 'Inactive' },
             ]}
           />
@@ -72,7 +89,7 @@ export default function AdminCharitiesPage() {
       {isLoading ? (
         <p className="text-sm text-charcoal/60">Loading…</p>
       ) : charities.length === 0 ? (
-        <p className="text-sm text-charcoal/60">No charities found.</p>
+        <p className="text-sm text-charcoal/60">No charities match. New sign-ups from the public site appear here as &ldquo;Awaiting approval&rdquo;; you can also <Link href="/admin/charities/new" className="text-accent underline">add a charity yourself</Link>.</p>
       ) : (
         <div className="space-y-3">
           {charities.map((charity) => (

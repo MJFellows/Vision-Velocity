@@ -12,6 +12,7 @@ import type { FundraisingEvent } from '@/lib/types';
 import { CharityForm, type CharityFormValues } from '@/components/forms/CharityForm';
 import { InteractionForm, type InteractionFormValues } from '@/components/forms/InteractionForm';
 import { SamePostcodePanel, type PanelSection } from '@/components/SamePostcodePanel';
+import { CharityAccessCard } from '@/components/CharityAccessCard';
 import { getCharity, getCharitySamePostcode, updateCharity, approveCharity, createInteraction, listOrders, listEvents, type CharityDetail, type OrderWithRelations, type NearbyRadiusKm } from '@/lib/adminApi';
 
 export default function CharityDetailPage() {
@@ -126,9 +127,10 @@ export default function CharityDetailPage() {
     try {
       const res = await approveCharity(id);
       setApprovalMessage(
-        res.email.sent
+        (res.email.sent
           ? 'Charity approved and the approval email was sent.'
-          : `Charity approved, but the approval email was not sent${res.email.error ? ` (${res.email.error})` : ''}. Please contact them directly.`
+          : `Charity approved, but the approval email was not sent${res.email.error ? ` (${res.email.error})` : ''}. Please contact them directly.`) +
+          (res.signIn?.invited ? (res.signIn.emailSent ? ' A "Set up your sign-in" email was also sent.' : ' Sign-in access was given, but the set-up email failed — use Resend set-up email below.') : '')
       );
       setConfirmingApproval(false);
       await loadCharity();
@@ -271,6 +273,15 @@ export default function CharityDetailPage() {
             </div>
           </dl>
         </Card>
+      )}
+
+      {!isEditing && (
+        <CharityAccessCard
+          charityId={charity.id}
+          charityEmail={charity.email}
+          charityContact={charity.contact_name}
+          approved={charity.subscription_status === 'active'}
+        />
       )}
 
       <Tabs

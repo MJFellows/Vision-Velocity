@@ -5,16 +5,18 @@ import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { useAuth } from '@/lib/auth';
 
-const navItems = [
+export const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard' },
+  { href: '/admin/events', label: 'Events' },
   { href: '/admin/charities', label: 'Charities' },
   { href: '/admin/orders', label: 'Orders' },
-  { href: '/admin/events', label: 'Events' },
   { href: '/admin/packages', label: 'Packages' },
   { href: '/admin/components', label: 'Components' },
-  { href: '/admin/bunnings', label: 'Bunnings' },
+  { href: '/admin/bunnings', label: 'Bunnings stores' },
   { href: '/admin/suppliers', label: 'Suppliers' },
-  { href: '/admin/supplier-status', label: 'Supplier status' },
+  { href: '/admin/supplier-status', label: 'Head-office negotiations' },
+  { href: '/admin/usage-report', label: 'Site usage' },
+  { href: '/admin/help', label: 'Help' },
 ];
 
 export function AdminNav() {

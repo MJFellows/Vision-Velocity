@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { OrderForm, type toOrderPayload } from '@/components/forms/OrderForm';
+import { RecordActions } from '@/components/RecordActions';
 import { getOrder, updateOrder } from '@/lib/adminApi';
 import type { OrderStatus } from '@/lib/types';
 import type { OrderWithRelations } from '@/lib/adminApi';
@@ -150,6 +151,16 @@ export default function OrderDetailPage() {
           </div>
         </dl>
       </Card>
+      )}
+
+      {!isEditing && (
+        <RecordActions
+          title="Order summary"
+          documentPath={`/api/admin/orders/${order.id}/document`}
+          emailPath={`/api/admin/orders/${order.id}/email`}
+          filename={`Order-summary-${order.id.slice(0, 8).toUpperCase()}.pdf`}
+          historyFor={{ type: 'order', id: order.id }}
+        />
       )}
 
       <Card className="max-w-lg">

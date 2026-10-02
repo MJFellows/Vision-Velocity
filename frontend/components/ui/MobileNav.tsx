@@ -2,45 +2,71 @@
 
 /**
  * Bottom tab bar for phone-width admin screens (Rita & Natalie's primary
- * device — see Task 2.2's mobile-first brief). Hidden at md+ where
- * AdminNav's sidebar takes over instead (see AdminLayout).
+ * device). Four main items — Home, Events, Charities, More — with "More"
+ * opening the rest of the menu. Hidden at md+ where AdminNav's sidebar takes over.
  */
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { navItems } from '@/components/layouts/AdminNav';
+import { useAuth } from '@/lib/auth';
 
-const items = [
-  { href: '/admin/dashboard', label: 'Home', icon: HomeIcon },
-  { href: '/admin/charities', label: 'Charities', icon: UsersIcon },
-  { href: '/admin/orders', label: 'Orders', icon: CalendarIcon },
-  { href: '/admin/events', label: 'Events', icon: CalendarIcon },
-  { href: '/admin/bunnings', label: 'Bunnings', icon: StoreIcon },
-  { href: '/admin/suppliers', label: 'Suppliers', icon: HandshakeIcon },
-];
+const MAIN = ['/admin/dashboard', '/admin/events', '/admin/charities'];
+const LABELS: Record<string, string> = { '/admin/dashboard': 'Home', '/admin/events': 'Events', '/admin/charities': 'Charities' };
 
 export function MobileNav() {
   const pathname = usePathname();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const { logout } = useAuth();
+  const inMore = !MAIN.some((h) => pathname?.startsWith(h));
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grey bg-white md:hidden">
-      {items.map(({ href, label, icon: Icon }) => {
-        const active = pathname?.startsWith(href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={clsx(
-              'flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium',
-              active ? 'text-accent' : 'text-charcoal/60'
-            )}
-          >
-            <Icon className="h-6 w-6" />
-            {label}
-          </Link>
-        );
-      })}
-    </nav>
+    <>
+      {moreOpen && (
+        <div className="fixed inset-0 z-40 bg-black/30 md:hidden" onClick={() => setMoreOpen(false)}>
+          <div className="absolute inset-x-0 bottom-16 rounded-t-card bg-white p-2 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            {navItems
+              .filter((i) => !MAIN.includes(i.href))
+              .map((i) => (
+                <Link
+                  key={i.href}
+                  href={i.href}
+                  onClick={() => setMoreOpen(false)}
+                  className={clsx('block rounded-card px-4 py-3 text-base', pathname?.startsWith(i.href) ? 'bg-accent/10 font-semibold text-accent' : 'text-charcoal')}
+                >
+                  {i.label}
+                </Link>
+              ))}
+            <button type="button" onClick={() => logout()} className="block w-full rounded-card px-4 py-3 text-left text-base text-charcoal/70">
+              Log out
+            </button>
+          </div>
+        </div>
+      )}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grey bg-white md:hidden">
+        {MAIN.map((href) => {
+          const active = pathname?.startsWith(href);
+          const Icon = href === '/admin/dashboard' ? HomeIcon : href === '/admin/events' ? CalendarIcon : UsersIcon;
+          return (
+            <Link key={href} href={href} className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', active ? 'text-accent' : 'text-charcoal/60')}>
+              <Icon className="h-6 w-6" />
+              {LABELS[href]}
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setMoreOpen((v) => !v)}
+          aria-expanded={moreOpen}
+          className={clsx('flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium', inMore || moreOpen ? 'text-accent' : 'text-charcoal/60')}
+        >
+          <MoreIcon className="h-6 w-6" />
+          More
+        </button>
+      </nav>
+    </>
   );
 }
 
@@ -73,23 +99,12 @@ function CalendarIcon({ className }: { className?: string }) {
   );
 }
 
-function StoreIcon({ className }: { className?: string }) {
+function MoreIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9 4 4h16l1 5" />
-      <path d="M4 9v11h16V9" />
-      <path d="M9 20v-6h6v6" />
-    </svg>
-  );
-}
-
-function HandshakeIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 12 3 7l3-3 5 3" />
-      <path d="M16 12l5-5-3-3-5 3" />
-      <path d="M8 12l3 3a2 2 0 0 0 3 0l4-4" />
-      <path d="M11 15l-2 2a2 2 0 1 1-3-3" />
+      <circle cx="5" cy="12" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="19" cy="12" r="1.5" />
     </svg>
   );
 }

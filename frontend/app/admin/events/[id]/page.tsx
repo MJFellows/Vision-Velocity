@@ -10,6 +10,9 @@ import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { FundraisingEventForm, type toEventPayload } from '@/components/forms/FundraisingEventForm';
+import { EventChecklist } from '@/components/EventChecklist';
+import { RecordActions } from '@/components/RecordActions';
+import { downloadCalendarEvent } from '@/lib/exporting';
 import { addEventSupplier, getEvent, listSuppliers, removeEventSupplier, updateEvent, updateEventSupplier } from '@/lib/adminApi';
 import { EVENT_COVER_LABELS, type EventSupplierStatus, type FundraisingEvent, type Supplier } from '@/lib/types';
 
@@ -29,6 +32,7 @@ export default function EventDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [topMessage, setTopMessage] = useState<string | null>(null);
 
   // Supplier picker
   const [search, setSearch] = useState('');
@@ -98,7 +102,19 @@ export default function EventDetailPage() {
     }
   };
 
+  const handleConfirmRequest = async () => {
+    setTopMessage(null);
+    try {
+      await updateEvent(id, { status: 'planned' });
+      await load();
+      setTopMessage('Request accepted — the event is now Planned. Set it to Confirmed once everything is agreed.');
+    } catch (err) {
+      setTopMessage(err instanceof Error ? err.message : 'Could not update the event.');
+    }
+  };
+
   const handleRemove = async (linkId: string) => {
+    if (!window.confirm('Remove this supplier from the event?')) return;
     setMessage(null);
     try {
       await removeEventSupplier(id, linkId);
@@ -140,10 +156,22 @@ export default function EventDetailPage() {
           <h1 className="mb-1">{formatEventDate(event.event_date)}</h1>
           <Badge tone={toneForStatus(event.status)}>{event.status}</Badge>
         </div>
-        <Button variant="outline" onClick={() => setIsEditing((v) => !v)}>
-          {isEditing ? 'Cancel' : 'Edit'}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {event.status === 'requested' && !isEditing && <Button onClick={handleConfirmRequest}>Confirm request</Button>}
+          <Button variant="outline" onClick={() => setIsEditing((v) => !v)}>
+            {isEditing ? 'Cancel' : 'Edit'}
+          </Button>
+        </div>
       </div>
+
+      {event.status === 'requested' && (
+        <p className="mb-4 max-w-2xl rounded-card bg-amber-50 p-3 text-sm text-amber-900">
+          This event was requested by the charity. Check the date and store (see Notes), then press Confirm request — or Edit to change the details first.
+        </p>
+      )}
+      {topMessage && <p className="mb-4 max-w-2xl text-sm text-green-700">{topMessage}</p>}
+
+      {!isEditing && <EventChecklist event={event} />}
 
       {isEditing ? (
         <Card className="mb-6 max-w-lg">
@@ -224,6 +252,33 @@ export default function EventDetailPage() {
           </dl>
         </Card>
       )}
+
+      <RecordActions
+        title="Run sheet"
+        documentPath={`/api/admin/events/${event.id}/run-sheet`}
+        emailPath={`/api/admin/events/${event.id}/email`}
+        filename={`Run-sheet-${event.event_date}.pdf`}
+        allowPrices
+        historyFor={{ type: 'event', id: event.id }}
+        extra={
+          <Button
+            type="button"
+            variant="outline"
+            data-track="Add to calendar"
+            onClick={() =>
+              downloadCalendarEvent({
+                date: event.event_date,
+                uid: event.id,
+                title: event.event_name || `Sausage sizzle: ${event.charities?.name ?? 'charity'}`,
+                location: event.bunnings_stores ? `Bunnings ${event.bunnings_stores.location}` : null,
+                description: event.charities?.name ? `Charity: ${event.charities.name}` : null,
+              })
+            }
+          >
+            Add to calendar
+          </Button>
+        }
+      />
 
       <Card className="mb-6 max-w-2xl">
         <CardHeader>

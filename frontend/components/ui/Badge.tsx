@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { statusLabel } from '@/lib/labels';
 
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -12,10 +13,14 @@ const toneClasses: Record<BadgeTone, string> = {
 
 export function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone?: BadgeTone }) {
   return (
-    <span className={clsx('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize', toneClasses[tone])}>
-      {children}
+    <span className={clsx('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', toneClasses[tone])}>
+      {typeof children === 'string' ? capitalise(statusLabel(children)) : children}
     </span>
   );
+}
+
+function capitalise(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /** Maps the schema's enum values to a sensible badge tone, so every status pill in the app looks consistent. */
@@ -30,6 +35,7 @@ export function toneForStatus(status: string): BadgeTone {
     case 'issue_resolved':
       return 'success';
     case 'trial':
+    case 'requested':
     case 'pending':
     case 'scheduled':
     case 'planned':

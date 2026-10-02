@@ -416,7 +416,7 @@ export interface LoginResponse {
 // Events (a date + Bunnings store + charity, with supplier stores linked per event)
 // ---------------------------------------------------------------------------
 
-export type EventStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled';
+export type EventStatus = 'requested' | 'planned' | 'confirmed' | 'completed' | 'cancelled';
 export type EventSupplierStatus = 'possible' | 'confirmed' | 'declined';
 export type EventCoverType = 'inside' | 'outside_covered' | 'outside_uncovered';
 
@@ -449,6 +449,7 @@ export interface FundraisingEvent {
   status: EventStatus;
   notes: string | null;
   event_name: string | null;
+  requested_by_charity?: boolean;
   estimated_hotdogs: number | null;
   estimated_staff: number | null;
   number_of_shifts: number | null;

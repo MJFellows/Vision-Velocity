@@ -15,6 +15,7 @@ import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges } from '@/lib/audit';
 import { sendEmail } from '@/lib/email';
+import { inviteCharityUser } from '@/lib/charity-auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -93,8 +94,26 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
     if (!emailSent) console.warn('[approve] approval email not sent:', emailError);
 
+    // Give the charity's contact a sign-in and email the set-up link (best effort).
+    let signIn: { invited: boolean; emailSent?: boolean; error?: string } = { invited: false };
+    if (data.email) {
+      try {
+        const result = await inviteCharityUser({
+          charityId: data.id as string,
+          email: data.email as string,
+          name: (data.contact_name as string | null) ?? null,
+          role: 'owner',
+          invitedBy: adminEmail,
+        });
+        signIn = { invited: true, emailSent: result.emailSent, error: result.emailError };
+      } catch (err) {
+        signIn = { invited: false, error: err instanceof Error ? err.message : String(err) };
+        console.warn('[approve] sign-in invite failed:', signIn.error);
+      }
+    }
+
     return NextResponse.json(
-      { data, email: { sent: emailSent, ...(emailError ? { error: emailError } : {}) } },
+      { data, email: { sent: emailSent, ...(emailError ? { error: emailError } : {}) }, signIn },
       { headers: cors }
     );
   } catch (error) {

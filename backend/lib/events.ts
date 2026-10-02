@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export const EVENT_STATUSES = ['planned', 'confirmed', 'completed', 'cancelled'] as const;
+export const EVENT_STATUSES = ['requested', 'planned', 'confirmed', 'completed', 'cancelled'] as const;
 export const EVENT_SUPPLIER_STATUSES = ['possible', 'confirmed', 'declined'] as const;
 export const EVENT_COVER_TYPES = ['inside', 'outside_covered', 'outside_uncovered'] as const;
 

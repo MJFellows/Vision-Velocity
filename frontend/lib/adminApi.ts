@@ -74,6 +74,7 @@ export function updateCharity(id: string, input: UpdateCharityInput) {
 
 export interface ApproveCharityResult {
   data: Charity;
+  signIn?: { invited: boolean; emailSent?: boolean; error?: string };
   email: { sent: boolean; error?: string };
 }
 

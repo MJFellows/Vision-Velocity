@@ -18,6 +18,7 @@ import { listAdminPackages, listBunningsStores, listCharities, type CreateEventI
 import { EVENT_COVER_LABELS, type BunningsStore, type Charity, type EventCoverType, type EventStatus, type FundraisingEvent, type Package } from '@/lib/types';
 
 export const EVENT_STATUS_OPTIONS: SelectOption[] = [
+  { value: 'requested', label: 'Requested by charity' },
   { value: 'planned', label: 'Planned' },
   { value: 'confirmed', label: 'Confirmed' },
   { value: 'completed', label: 'Completed' },
@@ -35,7 +36,7 @@ export const fundraisingEventSchema = z.object({
   event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date'),
   bunnings_store_id: z.string().uuid('Choose a Bunnings store'),
   charity_id: z.string().uuid('Choose a charity'),
-  status: z.enum(['planned', 'confirmed', 'completed', 'cancelled']),
+  status: z.enum(['requested', 'planned', 'confirmed', 'completed', 'cancelled']),
   notes: z.string().max(5000).optional(),
   event_name: z.string().trim().max(200),
   estimated_hotdogs: wholeNumber,
