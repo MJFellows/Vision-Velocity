@@ -101,7 +101,7 @@ The suggestions are in section 4; the decisions they need are in section 5; the 
 
 | # | Finding | Why it matters | Evidence |
 |---|---|---|---|
-| F1 | **No staging.** Changes are built, tested and deployed on production; staging was set to share the production database (30 September). | Test emails and test rows touch the live system; Claude cannot test signed-in pages without Mark. The Supabase Free plan allows two active projects, so a separate staging database costs nothing. | Memory of the 30 September decision; Supabase pricing |
+| F1 | **No staging.** Changes are built, tested and deployed on production; staging was set to share the production database (30 September). | Test emails and test rows touch the live system; Claude cannot test signed-in pages without Mark. The Supabase Free plan allows two active projects, so a separate staging database costs nothing. | CHANGELOG 30 September, decision 3; Supabase pricing |
 | F2 | **No automated tests** beyond lint, type check and build (CI). The accessibility check of 2 October was a one-off. | Regressions such as the invisible button (P5) go unnoticed. | `.github/workflows/ci.yml` |
 | F3 | **Hosting terms and limits.** Vercel Hobby is for non-commercial, personal use only; Supabase Free pauses after 7 days of low activity and has no automated backups. Both were accepted as risks on 29 September "before any real charity uses the app". | Real charities' data and a business use need the paid plans. | Vercel and Supabase documentation; CHANGELOG 29 September |
 | F4 | **Security items on hold** (29 September): admin roles not enforced, no security headers, in-memory rate limiter. | Acceptable for three founders; not once charities and officers sign in. | Security findings document |
