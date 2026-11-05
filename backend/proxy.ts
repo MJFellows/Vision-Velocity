@@ -154,7 +154,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/api/cron/');
   if (isPublicOrAuth) {
     const ip = getClientIp(request);
-    const result = checkRateLimit(`${ip}:${pathname}`);
+    const result = await checkRateLimit(`${ip}:${pathname}`);
     if (!result.allowed) {
       logRequest(request, 'RATE_LIMITED');
       return NextResponse.json(
