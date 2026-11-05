@@ -1,7 +1,7 @@
 # Vision Velocity — Recommended Next Steps
 
 **Compiled:** 5 November 2026
-**Updated:** 5 November 2026 — Mark and Natalie's temporary passwords changed (reported by Mark).
+**Updated:** 5 November 2026 — Mark and Natalie's temporary passwords changed (reported by Mark); manual smoke test run successfully (reported by Mark); step 5 progressed as recorded below.
 **Sources:** ROADMAP.md (28 Sep, fifth revision), BUILD_STATUS.md (30 Sep), task-4-2-deployment-progress-2026-09-30.md, supplier-refactor-and-store-import-2026-09-30.md, build-plan.md
 **Note:** The most recent dated status is 30 September 2026. Items marked *status unknown* have no recorded update since then.
 
@@ -13,7 +13,7 @@
 2. **Exercise the supplier and Bunnings pages** (`/admin/suppliers`, `/admin/supplier-status`, `/admin/bunnings`) with a real admin login. These have not been run since deployment.
 3. **Confirm the test sign-up emails arrived** (charity confirmation and admin notification).
 4. **Run the manual Smoke test workflow** in GitHub Actions, and check a tracking link on production.
-5. **Merge pull request #1**, create the `staging` branch and add branch protection.
+5. ~~Merge pull request #1~~ — **Done** (merged 30 September 2026, merge commit `c658b22`). ~~Create the `staging` branch~~ — **Done 5 November 2026** (created from `main` at `5edfbf4`). **Open:** branch protection on `main` and `staging` is not available on the current GitHub plan for a private repository (GitHub Pro required). Not upgraded, per instruction; decide whether to upgrade or accept the risk.
 6. **Set the email provider settings** (ROADMAP A3): `RESEND_API_KEY`, the verified sender and reply-to addresses, and `ADMIN_NOTIFICATION_EMAILS` (currently forwards to Mark only).
 7. **Decide the admin account creation method** (ROADMAP A5 / D14), then create the three admin accounts and run the admin tests, the Approve action and the audit-log check (A7).
 
