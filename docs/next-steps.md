@@ -22,7 +22,7 @@
 ## 2. Technical — before any real charity uses the app
 
 1. ⏸ Upgrade Vercel (Hobby is non-commercial) and Supabase (Free has no automatic backups) to paid plans. Not done: plan upgrades deferred at Mark's instruction.
-2. ⬜ Replace the in-memory rate limiter, which is per-instance on Vercel, with a shared store such as Upstash Redis.
+2. ✅ Replace the in-memory rate limiter with a shared store: Upstash Redis via @upstash/ratelimit (commit `32c72c3`, 5 Nov 2026). Production limits to be checked after the next deploy.
 3. ⏸ Add security headers and enforce roles (on hold at Mark's decision); finish the 24-item security audit.
 4. ⬜ Test a backup restore and set up error tracking (for example Sentry).
 5. ⬜ Seed real data: packages are still empty; `suppliers` and `bunnings_stores` are imported.
