@@ -1,56 +1,58 @@
 # Vision Velocity — Recommended Next Steps
 
 **Compiled:** 5 November 2026
-**Updated:** 5 November 2026 — Mark and Natalie's temporary passwords changed (reported by Mark); manual smoke test run successfully (reported by Mark); step 5 progressed as recorded below.
+**Updated:** 5 November 2026 (statuses as reported by Mark and checked in GitHub)
 **Sources:** ROADMAP.md (28 Sep, fifth revision), BUILD_STATUS.md (30 Sep), task-4-2-deployment-progress-2026-09-30.md, supplier-refactor-and-store-import-2026-09-30.md, build-plan.md
-**Note:** The most recent dated status is 30 September 2026. Items marked *status unknown* have no recorded update since then.
+**Note:** The most recent dated status in the source documents is 30 September 2026. Items marked *status unknown* have no recorded update since then.
+
+**Key:** ✅ done · 🟡 partly done · ⏸ waiting on a decision or input · ⬜ not started
 
 ---
 
 ## 1. Technical — immediate (Mark)
 
-1. ~~Sign in to production as an admin and change the temporary passwords~~ — **Done 5 November 2026 for Mark and Natalie (reported by Mark).** **Open:** Rita's password change (confirm with Rita).
-2. **Exercise the supplier and Bunnings pages** (`/admin/suppliers`, `/admin/supplier-status`, `/admin/bunnings`) with a real admin login. These have not been run since deployment.
-3. **Confirm the test sign-up emails arrived** (charity confirmation and admin notification).
-4. **Run the manual Smoke test workflow** in GitHub Actions, and check a tracking link on production.
-5. ~~Merge pull request #1~~ — **Done** (merged 30 September 2026, merge commit `c658b22`). ~~Create the `staging` branch~~ — **Done 5 November 2026** (created from `main` at `5edfbf4`). **Open:** branch protection on `main` and `staging` is not available on the current GitHub plan for a private repository (GitHub Pro required). Not upgraded, per instruction; decide whether to upgrade or accept the risk.
-6. **Set the email provider settings** (ROADMAP A3): `RESEND_API_KEY`, the verified sender and reply-to addresses, and `ADMIN_NOTIFICATION_EMAILS` (currently forwards to Mark only).
-7. **Decide the admin account creation method** (ROADMAP A5 / D14), then create the three admin accounts and run the admin tests, the Approve action and the audit-log check (A7).
+1. ✅ **Admin sign-in and temporary passwords.** Mark and Natalie have changed theirs (5 Nov 2026). 🟡 **Rita still to change hers.**
+2. ✅ **Supplier and Bunnings pages** (`/admin/suppliers`, `/admin/supplier-status`, `/admin/bunnings`) checked with a real admin sign-in.
+3. ✅ **Test sign-up emails** (charity confirmation and admin notification) confirmed as received.
+4. ✅ **Manual smoke test** run successfully against production (5 Nov 2026).
+5. ✅ **Pull request #1 merged** (30 Sep 2026, `c658b22`). ✅ **`staging` branch created** from `main`. ✅ **Repository made public** and **branch ruleset active** on `main` and `staging` (deletion and force-push blocked). Ruleset set up on 5 Nov 2026.
+6. ⏸ **Email provider settings** (ROADMAP A3). Deferred at Mark's request. Sending and approval emails were received live on 29 Sep. Production Vercel variables still to be confirmed by Mark.
+7. ✅ **Admin accounts.** The three accounts exist (Mark, Rita, Natalie), confirmed by Mark on 5 Nov 2026. Creation method is therefore settled (ROADMAP A5 / D14). 🟡 The admin tests, the Approve action and the audit-log check (A7) still to run.
 
 ## 2. Technical — before any real charity uses the app
 
-1. Upgrade Vercel (Hobby is non-commercial) and Supabase (Free has no automatic backups) to paid plans.
-2. Replace the in-memory rate limiter, which is per-instance on Vercel, with a shared store such as Upstash Redis.
-3. Add security headers and enforce roles (currently on hold); finish the 24-item security audit.
-4. Test a backup restore and set up error tracking (for example Sentry).
-5. Seed real data: packages are still empty; `suppliers` and `bunnings_stores` are imported.
-6. Decide on the charity login gap and the thank-you page wording (it refers to a dashboard login that does not exist).
-7. Decide on order status rules and whether staging should get its own database (staging currently shares production).
+1. ⏸ Upgrade Vercel (Hobby is non-commercial) and Supabase (Free has no automatic backups) to paid plans. Not done: plan upgrades deferred at Mark's instruction.
+2. ⬜ Replace the in-memory rate limiter, which is per-instance on Vercel, with a shared store such as Upstash Redis.
+3. ⏸ Add security headers and enforce roles (on hold at Mark's decision); finish the 24-item security audit.
+4. ⬜ Test a backup restore and set up error tracking (for example Sentry).
+5. ⬜ Seed real data: packages are still empty; `suppliers` and `bunnings_stores` are imported.
+6. ⏸ Decide on the charity login gap and the thank-you page wording (it refers to a dashboard login that does not exist).
+7. ⏸ Decide on order status rules and whether staging should get its own database (staging currently shares production).
 
 ## 3. Business — the real gate for the pilot
 
 The roadmap treats these as more important than the app. None has a recorded completion.
 
-1. **Packages and prices** (C1): settle the flat all-inclusive prices for the pilot. Rita and Natalie.
-2. **A4 flyer** (C2): one price per package, no product breakdown, no volume claims. Natalie.
-3. **Bunnings store visits** (C3, C4): about three stores each; collect Activities Officer contacts; build the two seed lists. Rita and Natalie.
-4. **Woolworths and 7am delivery** (C6): Natalie to ask specifically whether 7am Saturday delivery is feasible and who fulfils it.
-5. **Pilot operating runbook** (C7): who sources and buys goods, how they reach the delivery address by 7am, who signs for them, and how invoicing on credit works. Rita, Natalie and Mark.
-6. **Revise the pilot procedures** (C8): remove the assumed delivery guarantee and name one system of record (app or spreadsheet). Mark.
-7. **Revise the landing page** (C9): remove the placeholder testimonial and unearned claims; provide charity-facing and Bunnings-facing versions.
-8. **Charity terms and privacy statement** (C10): confirm legal points with a qualified adviser, and confirm incorporation, ABN and equity/roles. Rita.
-9. **Support mailbox** (C11): set up `support@` or confirm `hello@`, and agree who monitors it.
-10. **Recruit 10–15 pilot charities** (C12). Rita and Natalie.
-11. **Train Rita and Natalie** and prepare the issue log, metrics sheet and go/no-go checklist (C13). Mark.
-12. **Approve the brand direction** and answer the brand document's 10 open questions (C5). Rita and Natalie.
+1. ⬜ **Packages and prices** (C1): settle the flat all-inclusive prices for the pilot. Rita and Natalie.
+2. ⬜ **A4 flyer** (C2): one price per package, no product breakdown, no volume claims. Natalie.
+3. ⬜ **Bunnings store visits** (C3, C4): about three stores each; collect Activities Officer contacts; build the two seed lists. Rita and Natalie.
+4. ⬜ **Woolworths and 7am delivery** (C6): Natalie to ask specifically whether 7am Saturday delivery is feasible and who fulfils it.
+5. ⬜ **Pilot operating runbook** (C7): who sources and buys goods, how they reach the delivery address by 7am, who signs for them, and how invoicing on credit works. Rita, Natalie and Mark.
+6. ⬜ **Revise the pilot procedures** (C8): remove the assumed delivery guarantee and name one system of record (app or spreadsheet). Mark.
+7. ⬜ **Revise the landing page** (C9): remove the placeholder testimonial and unearned claims; provide charity-facing and Bunnings-facing versions.
+8. ⬜ **Charity terms and privacy statement** (C10): confirm legal points with a qualified adviser, and confirm incorporation, ABN and equity/roles. Rita.
+9. ⬜ **Support mailbox** (C11): set up `support@` or confirm `hello@`, and agree who monitors it.
+10. ⬜ **Recruit 10–15 pilot charities** (C12). Rita and Natalie.
+11. ⬜ **Train Rita and Natalie** and prepare the issue log, metrics sheet and go/no-go checklist (C13). Mark.
+12. ⬜ **Approve the brand direction** and answer the brand document's 10 open questions (C5). Rita and Natalie.
 
 ## 4. Decisions needed from Mark, Rita and Natalie
 
-- Code location and repository confirmation (D4) — now answered: `MJFellows/Vision-Velocity`.
-- Pilot volume target and duration (D9) — agree a specific number.
-- Status of the survey, business plan and product requirements document (D10).
-- Email open and click tracking for the pilot (D11) — confirm.
-- Whether the revenue model is charity-pays or supplier-pays (E2 — after pilot evidence).
+- ✅ Code location and repository (D4): `MJFellows/Vision-Velocity`, now public.
+- ⏸ Pilot volume target and duration (D9): agree a specific number.
+- ⏸ Status of the survey, business plan and product requirements document (D10).
+- ⏸ Email open and click tracking for the pilot (D11): confirm.
+- ⏸ Whether the revenue model is charity-pays or supplier-pays (E2, after pilot evidence).
 
 ## 5. Pilot timing — flag
 
