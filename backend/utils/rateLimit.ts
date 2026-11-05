@@ -19,20 +19,28 @@ export interface RateLimitResult {
   resetAt: number;
 }
 
-const redisConfigured =
-  Boolean(process.env.UPSTASH_REDIS_REST_URL) && Boolean(process.env.UPSTASH_REDIS_REST_TOKEN);
+// Created on first use, not at module load, so a misconfigured value cannot
+// break `next build` (Vercel collects page data at build time).
+let redis: Redis | null | undefined;
 
-const redis = redisConfigured ? Redis.fromEnv() : null;
+function getRedis(): Redis | null {
+  if (redis === undefined) {
+    const configured =
+      Boolean(process.env.UPSTASH_REDIS_REST_URL) && Boolean(process.env.UPSTASH_REDIS_REST_TOKEN);
+    redis = configured ? Redis.fromEnv() : null;
+  }
+  return redis;
+}
 
 // One Ratelimit instance per (limit, window) pair, so dynamic arguments still work.
 const limiters = new Map<string, Ratelimit>();
 
-function getLimiter(limit: number, windowMs: number): Ratelimit {
+function getLimiter(limit: number, windowMs: number, store: Redis): Ratelimit {
   const id = `${limit}:${windowMs}`;
   let limiter = limiters.get(id);
   if (!limiter) {
     limiter = new Ratelimit({
-      redis: redis!,
+      redis: store,
       limiter: Ratelimit.slidingWindow(limit, `${windowMs} ms`),
       prefix: 'vv:ratelimit',
     });
@@ -74,12 +82,20 @@ export async function checkRateLimit(
   limit = Number(process.env.RATE_LIMIT_MAX_REQUESTS ?? 20),
   windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000)
 ): Promise<RateLimitResult> {
-  if (!redis) {
+  try {
+    const store = getRedis();
+    if (!store) {
+      return checkMemory(key, limit, windowMs);
+    }
+
+    const { success, remaining, reset } = await getLimiter(limit, windowMs, store).limit(key);
+    return { allowed: success, remaining, resetAt: reset };
+  } catch (error) {
+    // Redis unreachable or misconfigured at runtime: fall back to the per-instance
+    // limiter rather than failing every request.
+    console.error('Rate limiter fell back to in-memory store:', error);
     return checkMemory(key, limit, windowMs);
   }
-
-  const { success, remaining, reset } = await getLimiter(limit, windowMs).limit(key);
-  return { allowed: success, remaining, resetAt: reset };
 }
 
 /** Best-effort client IP extraction behind Vercel's proxy. */
