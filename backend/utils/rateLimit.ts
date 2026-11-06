@@ -84,8 +84,6 @@ export async function checkRateLimit(
 ): Promise<RateLimitResult> {
   try {
     const store = getRedis();
-    // Diagnostic: shows in Vercel runtime logs which store served this check.
-    console.log(`[rate-limit] store=${store ? 'upstash' : 'memory'}`);
     if (!store) {
       return checkMemory(key, limit, windowMs);
     }

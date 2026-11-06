@@ -22,9 +22,9 @@
 ## 2. Technical — before any real charity uses the app
 
 1. ⏸ Upgrade Vercel (Hobby is non-commercial) and Supabase (Free has no automatic backups) to paid plans. Not done: plan upgrades deferred at Mark's instruction.
-2. ✅ Replace the in-memory rate limiter with a shared store: Upstash Redis via @upstash/ratelimit (commit `32c72c3`, 5 Nov 2026). Production limits to be checked after the next deploy.
+2. ✅ Replace the in-memory rate limiter with a shared store: Upstash Redis via @upstash/ratelimit (commit `32c72c3`, 5 Nov 2026). Verified 6 Nov 2026 against production: the first 20 requests per minute from one IP returned 200 and the rest returned 429. The Upstash token was added to Vercel and the backend redeployed.
 3. ⏸ Add security headers and enforce roles (on hold at Mark's decision); finish the 24-item security audit.
-4. ⬜ Test a backup restore and set up error tracking (for example Sentry).
+4. 🟡 Test a backup restore (⬜) and error tracking (🟡: Sentry is integrated in both apps, commits `f4f64d8` and `5a219a2`; a test error has not yet been confirmed in the Sentry dashboard).
 5. ⬜ Seed real data: packages are still empty; `suppliers` and `bunnings_stores` are imported.
 6. ⏸ Decide on the charity login gap and the thank-you page wording (it refers to a dashboard login that does not exist).
 7. ⏸ Decide on order status rules and whether staging should get its own database (staging currently shares production).
