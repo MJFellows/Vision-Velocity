@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start -p 3001",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:types": "supabase gen types typescript --project-id kajhrbwxlzulqqissvwl --schema public > lib/database.types.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
