@@ -4,6 +4,8 @@
  * documents (with a PDF attachment), sign-in links and event requests.
  */
 
+import { allowedRecipients } from './email-allowlist';
+
 export interface MailAttachment {
   filename: string;
   /** File contents. */
@@ -52,13 +54,18 @@ export async function sendMail(message: MailMessage): Promise<string | null> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY environment variable not configured');
 
+  // On staging, recipients not on EMAIL_ALLOWLIST are dropped; if none remain, nothing is sent.
+  const to = allowedRecipients(message.to);
+  if (to.length === 0) return null;
+  const cc = message.cc === undefined ? undefined : allowedRecipients(message.cc);
+
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'noreply@visionvelocity.com.au',
-      to: message.to,
-      cc: message.cc,
+      to,
+      cc: cc && cc.length > 0 ? cc : undefined,
       subject: message.subject,
       html: message.html,
       text: message.text,

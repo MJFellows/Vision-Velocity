@@ -2,6 +2,7 @@
 // Task 3.3: Email Service with Tracking Integration
 
 import { renderTemplate } from './handlebars-utils';
+import { allowedRecipients } from './email-allowlist';
 import {
   getTemplate,
   generateTrackingPixel,
@@ -102,6 +103,10 @@ async function sendViaResend(
     throw new Error('RESEND_API_KEY environment variable not configured');
   }
 
+  // On staging, a recipient not on EMAIL_ALLOWLIST is logged and skipped.
+  const [allowedTo] = allowedRecipients(recipientEmail);
+  if (!allowedTo) return null;
+
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -111,7 +116,7 @@ async function sendViaResend(
       },
       body: JSON.stringify({
         from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'noreply@visionvelocity.com.au',
-        to: recipientEmail,
+        to: allowedTo,
         subject,
         html: htmlBody,
         text: plainTextBody,
