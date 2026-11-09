@@ -1,8 +1,8 @@
 ---
 title: Vision Velocity — Review of data, presentation and ease of use, with a build plan as Claude prompts
 created: 2026-10-25
-updated: 2026-10-25
-status: Draft for Mark's review — nothing in this plan has been built
+updated: 2026-11-09 (section 5a added: who decides each question and which prompts can run before Rita and Natalie reply; interim prompt 1.1a; prompt 2.3 cost types made extendable; progress table updated)
+status: Draft for Mark's review — no prompt has been run yet; two items of prompt 6.1 (shared rate limiter, Sentry) were done separately on 6 November
 basis: Project documents (INDEX, CHANGELOG, ROADMAP, ease-of-use plan and build notes, invoices note, meeting notes, brand draft); the code in VV App\04-development at commit 60b7286 (main, level with GitHub); read-only queries of the live database; screenshots of the live public pages at phone and computer widths
 ---
 
@@ -186,11 +186,65 @@ Each prompt stops and asks if its decision is not recorded. Suggested defaults a
 
 ---
 
+## 5a. Who decides, and what can run before Rita and Natalie reply (9 November 2026)
+
+Most of the twelve decisions are technical or data-model choices that Mark can make himself. Only three (prices, public wording, the About and FAQ text) and the user-testing sessions need Rita and Natalie.
+
+### Who decides each question
+
+| # | Decision | Who decides | Can Mark answer it now? |
+|---|---|---|---|
+| Q1 | Prices on the public site | Rita and Natalie (pilot packages and prices, roadmap C1) | No. An interim "price on enquiry" panel is in prompt 1.1a |
+| Q2 | Remove the testimonial and unsupported claims | Removal: Mark, as an interim safety step. Replacement wording: Rita and Natalie | Removal only (prompt 1.1a) |
+| Q3 | About text and FAQ answers | Rita and Natalie approve | No |
+| Q4 | Logo file | Mark can supply the current production logo; the redrawn Core logo depends on the founders' brand decisions (roadmap C5) | Yes, if Mark has the current file |
+| Q5 | Staging | Mark | Yes |
+| Q6 | Orders and events | Mark | Yes |
+| Q7 | Event times | Mark | Yes |
+| Q8 | Cost categories | Mark sets the recommended list; founders can add types later (prompt 2.3 now stores them in a list, not a fixed set) | Yes |
+| Q9 | Charity approval fields | Mark | Yes |
+| Q10 | ABN Lookup key | Mark (optional) | Yes |
+| Q11 | Unused tables and columns | Mark | Yes |
+| Q12 | Hosting and security hold | Mark; spending on paid plans may need the founders' agreement | Yes for security headers and roles; paid plans at Mark's discretion |
+
+### Prompts Mark can run now (suggested order)
+
+| Order | Prompt | Mark's input needed |
+|---|---|---|
+| 1 | **0.1** Tools, schema, types, data dictionary | Reconnect the Supabase connector to the account that owns the Vision Velocity project (on 9 November it still listed only the Teacher Management project). The Vercel connector now reaches team VV |
+| 2 | **0.2** Staging | Answer Q5; create the free Supabase project. The `staging` branch already exists (5 November) but shares the production database |
+| 3 | **0.3** Automated checks | None |
+| 4 | **1.1a** Interim public-site clean-up | Approve the removals (no new wording) |
+| 5 | **3.1** Interface kit | None |
+| 6 | **2.1**, **2.2**, **2.3**, **2.4** | Answer Q6, Q7, Q8 and Q9; Q10 optional |
+| 7 | **2.5**, then **4.3**, **4.2**, **4.1** | None. 4.3 builds the import and store-visit tools; the founders' lists can be loaded whenever they exist |
+| 8 | **4.4** Ready-for-the-pilot checklist | None |
+| 9 | **3.2**, **3.3**, **2.6**, **3.4** | Answer Q11 (for 2.6) |
+| 10 | **5.1** Accessibility, signed in | Mark runs the screen-reader check |
+| 11 | **6.1** remaining technical items | Lift the hold on security headers and roles; confirm a Sentry test error; paid plans when Mark chooses |
+| Any time | **6.2** Later improvements | Low priority |
+
+### Prompts that can be prepared now and finished later
+
+- **1.3 Brand assets:** run now with the current logo; replace it when the founders approve the redrawn Core logo.
+- **1.2 Bunnings-facing page:** Claude can draft it now; publishing waits for Natalie (partnerships and marketing).
+- **5.2 User testing:** steps 1 and 2 (packs, staging accounts) now; the sessions need Rita, Natalie, two or three charities and a Bunnings officer.
+- **6.1 step 6, privacy notice:** draft now; approval by Rita (governance) with an adviser.
+
+### Waiting on Rita and Natalie
+
+- **1.1** full rewrite of the public pages (Q1, Q2 wording, Q3).
+- **5.2** user-testing sessions.
+
+**Caveat.** Prompts 2.3 (pilot economics) and 4.3 (imports and store visits) assume the app is the pilot's system of record (roadmap decision D7, recommended but still open). They remain useful either way, but are most valuable if the founders agree.
+
+---
+
 ## 6. Working rules for every prompt
 
 Each prompt below begins "Follow the working rules in section 6". A new Claude session attached to the Vision Velocity project, with the `VV App` folder connected, can read this document, so the rules are not repeated in every prompt.
 
-1. **Read first:** `claude/INDEX.md`, the latest entries of `claude/CHANGELOG.md`, this document's findings cited by the prompt, and any document the prompt names. Check whether the prompt's decision (section 5) is recorded; if not, ask Mark before building.
+1. **Read first:** `claude/INDEX.md`, the latest entries of `claude/CHANGELOG.md`, the relevant thread document, this document's findings cited by the prompt, and any document the prompt names. Documents archived on 30 October are in `claude/archive/` under the same names (for example `claude/archive/user-testing-script-2026-10-02.md`). Check whether the prompt's decision (sections 5 and 5a) is recorded; if not, ask Mark before building. Mirror every project document you create or change to `VV App\Docs\claude-project\` (see INDEX).
 2. **Code and git:** the code is in `C:\Users\markj\OneDrive\Desktop\VV App\04-development` (GitHub `MJFellows/Vision-Velocity`, branch `main`). Its `.git` file points to `C:/Users/markj/vv-git/04-development.git`, so run git on Windows (PowerShell through Desktop Commander), not from the Linux shell. Before editing: `git status` clean and `git pull` level with `origin/main`. Production deploys `main` to Vercel (frontend `https://visionvelocity.com.au`, back end `https://api.visionvelocity.com.au`).
 3. **Database:** Supabase project `kajhrbwxlzulqqissvwl` (Sydney). Every schema change goes in a dated file in `database/migrations/` and is applied to the live database (and to staging once it exists) through the Supabase connector; if the connector cannot see the project, stop and ask Mark to reconnect it. Run the Supabase security and performance advisers after each change. Back up a table before any destructive change, and never drop a table or column without Mark's explicit yes in the chat.
 4. **Staging first** once prompt 0.2 is done: build on a branch, deploy to staging, test there (Claude may sign in to staging with test accounts it creates), then merge to `main`.
@@ -205,7 +259,7 @@ Each prompt below begins "Follow the working rules in section 6". A new Claude s
 
 ## 7. The prompts
 
-Recommended order: **0.1 → 1.1 → 0.2 → 0.3 → 1.3 → 3.1 → 2.1 → 2.2 → 2.3 → 2.4 → 4.4 → 5.2 → 6.1**, then the "Soon" items (1.2, 2.5, 2.6, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 5.1), then "Later" (6.2). Prompt 1.1 is small and urgent and may run before staging exists.
+Recommended order: **0.1 → 1.1 → 0.2 → 0.3 → 1.3 → 3.1 → 2.1 → 2.2 → 2.3 → 2.4 → 4.4 → 5.2 → 6.1**, then the "Soon" items (1.2, 2.5, 2.6, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 5.1), then "Later" (6.2). Prompt 1.1 is small and urgent and may run before staging exists. **Until Rita and Natalie reply, use the order in section 5a, with prompt 1.1a in place of 1.1.**
 
 ### Phase 0 — Foundations
 
@@ -278,6 +332,24 @@ Goal: nothing on the public site claims more than Vision Velocity can deliver to
 7. Fix the invisible "Get Started Today" button: add tailwind-merge and a cn() helper (lib/cn.ts), use it in components/ui/Button.tsx so a caller's colour classes override the variant's, and give the dark-panel buttons proper variants rather than overriding colours.
 8. Add page titles and descriptions for each public page.
 Acceptance: screenshots at 390 px and 1366 px of every public page (save them to VV App\Docs\screenshots\2026-10-25-public\); no placeholder text; the closing button reads clearly; the 0.3 checks (if present) pass.
+Close out per rule 8 and commit per rule 9.
+```
+
+#### Prompt 1.1a — Interim public-site clean-up, before the founders' wording (S2, part)
+
+Added 9 November 2026 for use while Q1–Q3 are unanswered. It removes and fixes; it writes no new claims. Prompt 1.1 later supplies the approved wording.
+
+```text
+Follow the working rules in section 6 of claude/improvement-plan-prompts-2026-10-25.md. Mark approves this interim clean-up; Rita and Natalie's decisions on prices and wording (Q1-Q3) come later in prompt 1.1.
+
+Goal: until the founders decide prices and wording, the public site removes what Vision Velocity cannot yet support and adds no new claims. Findings P1, P2, P4, P5, and the parts of P3 that can simply be removed.
+
+1. Remove the testimonial section (components/landing/Testimonial.tsx) from the landing page; keep the file with a comment pointing to prompt 1.1.
+2. Pricing: replace the hard-coded Bronze/Gold/Platinum tiers in components/landing/PricingTiers.tsx with the active rows of the packages table (via GET /api/public/landing-page-data, extended if needed). While there are none, show "Prices are confirmed when we talk about your event" with a contact button. No prices, tier names or "Most popular" badge are typed into the code.
+3. Remove, without rewriting, statements of partnerships, coverage ("across Australia"), "proven", response times ("within 24 hours"), refund terms, and a charity dashboard that tracks revenue: on the landing page (Hero, Benefits, HowItWorks, CTAFooter, FAQ), /public/faq, the sign-up form and the sign-up success page. Where a removal leaves a gap, use the plainest factual sentence already on the site. List every removed sentence, with its page, in the build note for Rita and Natalie to review in prompt 1.1.
+4. Remove the hero placeholder block. Hide the About page from the header and footer until prompt 1.1 supplies approved text (unless Mark asks for a two-line factual description from claude/vision-velocity-overview.md instead).
+5. Fix the invisible "Get Started Today" button: add tailwind-merge and lib/cn.ts, use cn() in components/ui/Button.tsx so a caller's classes override the variant's, and give the dark-panel buttons proper variants instead of colour overrides.
+Acceptance: screenshots at 390 px and 1366 px of every public page saved to VV App\Docs\screenshots\<date>-public-interim\; no placeholder text; no prices or claims beyond what the database holds; the closing button reads clearly; the build note lists all removed text.
 Close out per rule 8 and commit per rule 9.
 ```
 
@@ -361,7 +433,7 @@ Follow the working rules in section 6 of claude/improvement-plan-prompts-2026-10
 
 Goal: the pilot produces real cost and margin figures for the pricing decision (ROADMAP D2 and E1; finding D4).
 
-1. Migration: table order_costs (id, order_id references orders on delete cascade, cost_type enum from decision Q8, description, supplier_id references suppliers (optional), amount_aud numeric(10,2) >= 0, incurred_on date, receipt_reference text, entered_by_admin_id references admin_users, timestamps) with admin-only row-level security and audit triggers; orders.founder_minutes integer (time spent by founders on the order).
+1. Migration: lookup table cost_types (name primary key, display_order, is_active), seeded with the list from decision Q8, so founders can add types later without a schema change; table order_costs (id, order_id references orders on delete cascade, cost_type references cost_types(name), description, supplier_id references suppliers (optional), amount_aud numeric(10,2) >= 0, incurred_on date, receipt_reference text, entered_by_admin_id references admin_users, timestamps) with admin-only row-level security and audit triggers; orders.founder_minutes integer (time spent by founders on the order).
 2. Order page: a "Costs" card to add, edit and remove cost lines, with totals, and a field for founder time; shown only to admins, never on charity or officer pages or documents.
 3. New admin page "Pilot economics" (under Reports): per order and per month — invoiced amount (from invoices, excluding void), total cost by type, margin in dollars and per cent, founder hours; filters by date range; spreadsheet download. Include a short explanation of how each figure is calculated.
 4. Needs attention: "Delivered order with no costs entered" two days after delivery.
@@ -582,6 +654,8 @@ Close out per rule 8 and commit per rule 9.
 
 #### Prompt 6.1 — Before the first real charity (S23)
 
+*Note (9 November 2026):* step 3 (shared rate limiter) was done and verified on 6 November; step 2 (Sentry) is installed and needs only a confirmed test error and the alert address. When running this prompt, check those two and go on to steps 1, 4, 5 and 6.
+
 ```text
 Follow the working rules in section 6 of claude/improvement-plan-prompts-2026-10-25.md. Decision Q12 must be recorded; Mark does any step that involves payment or account changes.
 
@@ -615,32 +689,35 @@ Close out per rule 8 and commit per rule 9.
 
 ## 8. Progress
 
-| Prompt | Status | Date | Commit | Build note |
-|---|---|---|---|---|
-| 0.1 Tools, schema, types, data dictionary | Not started | | | |
-| 0.2 Staging | Not started (needs Q5) | | | |
-| 0.3 Automated checks | Not started | | | |
-| 1.1 Truthful public pages | Not started (needs Q1–Q3) | | | |
-| 1.2 Bunnings-facing page | Not started | | | |
-| 1.3 Brand assets | Not started (needs Q4) | | | |
-| 2.1 Orders linked to events | Not started (needs Q6) | | | |
-| 2.2 Times and delivery | Not started (needs Q7) | | | |
-| 2.3 Pilot economics | Not started (needs Q8) | | | |
-| 2.4 Charity records and sign-up | Not started (needs Q9, Q10 optional) | | | |
-| 2.5 People and activity log | Not started | | | |
-| 2.6 Tidy model and summary | Not started (needs Q11) | | | |
-| 3.1 Interface kit | Not started | | | |
-| 3.2 Navigation | Not started | | | |
-| 3.3 Event page and history | Not started | | | |
-| 3.4 Dashboard | Not started | | | |
-| 4.1 Events views and search | Not started | | | |
-| 4.2 Nearest suppliers | Not started | | | |
-| 4.3 Import and store visits | Not started | | | |
-| 4.4 Pilot checklist and safer forms | Not started | | | |
-| 5.1 Accessibility, signed in | Not started | | | |
-| 5.2 User testing round | Not started (needs people) | | | |
-| 6.1 Before the first real charity | Not started (needs Q12) | | | |
-| 6.2 Later improvements | Not started | | | |
+Status as at 9 November 2026. "Needs Rita and Natalie": **No** = Mark can run it; **Part** = prepare now, finish after their input; **Yes** = wait (see section 5a).
+
+| Prompt | Needs Rita and Natalie | Status | Date | Commit | Build note |
+|---|---|---|---|---|---|
+| 0.1 Tools, schema, types, data dictionary | No | Not started (Supabase connector to be reconnected first) | | | |
+| 0.2 Staging | No | Not started (needs Q5). `staging` branch created 5 November; it still shares the production database | | | |
+| 0.3 Automated checks | No | Not started | | | |
+| 1.1 Truthful public pages | Yes | Not started (needs Q1–Q3) | | | |
+| 1.1a Interim public-site clean-up | No | Not started (Mark approves the removals) | | | |
+| 1.2 Bunnings-facing page | Part | Not started (draft now; publish after Natalie) | | | |
+| 1.3 Brand assets | Part | Not started (needs Q4; current logo now, redrawn logo later) | | | |
+| 2.1 Orders linked to events | No | Not started (needs Q6) | | | |
+| 2.2 Times and delivery | No | Not started (needs Q7) | | | |
+| 2.3 Pilot economics | No | Not started (needs Q8) | | | |
+| 2.4 Charity records and sign-up | No | Not started (needs Q9, Q10 optional) | | | |
+| 2.5 People and activity log | No | Not started | | | |
+| 2.6 Tidy model and summary | No | Not started (needs Q11) | | | |
+| 3.1 Interface kit | No | Not started | | | |
+| 3.2 Navigation | No | Not started | | | |
+| 3.3 Event page and history | No | Not started | | | |
+| 3.4 Dashboard | No | Not started | | | |
+| 4.1 Events views and search | No | Not started | | | |
+| 4.2 Nearest suppliers | No | Not started | | | |
+| 4.3 Import and store visits | No | Not started (tools only; lists loaded later) | | | |
+| 4.4 Pilot checklist and safer forms | No | Not started | | | |
+| 5.1 Accessibility, signed in | No | Not started (needs staging, 0.2) | | | |
+| 5.2 User testing round | Part | Not started (packs and accounts now; sessions need people) | | | |
+| 6.1 Before the first real charity | Part (privacy notice) | **Partly done outside the plan:** shared rate limiter on Upstash Redis verified in production 6 November (`32c72c3`, `69bc6e9`, `294cd03`); Sentry added to both apps (`f4f64d8`, `5a219a2`), test error not yet confirmed. Remaining: paid plans, backups and restore test, security headers, role enforcement, privacy notice | 2026-11-06 | see left | CHANGELOG 2026-11-06 |
+| 6.2 Later improvements | No | Not started | | | |
 
 ---
 
