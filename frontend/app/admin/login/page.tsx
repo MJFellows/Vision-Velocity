@@ -25,10 +25,11 @@ function LoginFields() {
 
   return (
     <div className="space-y-4">
-      <Input label="Email" type="email" autoComplete="username" error={errors.email?.message} {...register('email')} />
+      <Input label="Email" type="email" required autoComplete="username" error={errors.email?.message} {...register('email')} />
       <Input
         label="Password"
         type="password"
+        required
         autoComplete="current-password"
         error={errors.password?.message}
         {...register('password')}

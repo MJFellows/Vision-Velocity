@@ -138,9 +138,10 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <h2 className="text-2xl font-bold text-navy">Tell us about your charity</h2>
           <p className="mt-2 text-charcoal/70">Step 1 of 4</p>
         </div>
-        <form onSubmit={step1Form.handleSubmit(onStep1Next)} className="space-y-4">
+        <form noValidate onSubmit={step1Form.handleSubmit(onStep1Next)} className="space-y-4">
           <Input
             label="Charity name"
+            required
             placeholder="e.g. Local Youth Sports Club"
             error={step1Form.formState.errors.charity_name?.message}
             {...step1Form.register('charity_name')}
@@ -172,9 +173,10 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <h2 className="text-2xl font-bold text-navy">Your contact details</h2>
           <p className="mt-2 text-charcoal/70">Step 2 of 4</p>
         </div>
-        <form onSubmit={step2Form.handleSubmit(onStep2Next)} className="space-y-4">
+        <form noValidate onSubmit={step2Form.handleSubmit(onStep2Next)} className="space-y-4">
           <Input
             label="Contact person name"
+            required
             placeholder="e.g. Sarah Johnson"
             error={step2Form.formState.errors.contact_name?.message}
             {...step2Form.register('contact_name')}
@@ -182,6 +184,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <Input
             label="Email address"
             type="email"
+            required
             placeholder="e.g. sarah@charity.org"
             error={step2Form.formState.errors.email?.message}
             {...step2Form.register('email')}
@@ -189,6 +192,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <Input
             label="Phone number"
             type="tel"
+            required
             placeholder="e.g. (02) 1234 5678"
             error={step2Form.formState.errors.phone?.message}
             {...step2Form.register('phone')}
@@ -219,16 +223,18 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <h2 className="text-2xl font-bold text-navy">Plan your first event</h2>
           <p className="mt-2 text-charcoal/70">Step 3 of 4</p>
         </div>
-        <form onSubmit={step3Form.handleSubmit(onStep3Next)} className="space-y-4">
+        <form noValidate onSubmit={step3Form.handleSubmit(onStep3Next)} className="space-y-4">
           <Input
             label="Event date"
             type="date"
+            required
             min={new Date().toISOString().split('T')[0]}
             error={step3Form.formState.errors.event_date?.message}
             {...step3Form.register('event_date')}
           />
           <Select
             label="Preferred Bunnings location"
+            required
             placeholder="Select a Bunnings location…"
             options={bunningsStores.map((store) => ({ value: store.id, label: store.location }))}
             error={step3Form.formState.errors.bunnings_store_id?.message}
@@ -237,6 +243,7 @@ export function SignupForm({ bunningsStores }: { bunningsStores: BunningsStore[]
           <Input
             label="Expected number of attendees"
             type="number"
+            required
             placeholder="e.g. 50"
             min={1}
             max={500}
