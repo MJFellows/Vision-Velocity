@@ -2,6 +2,7 @@
 
 import { api } from './api';
 import type { EventCoverType, EventStatus, OrderStatus } from './types';
+import type { toRegistrationPayload } from '@/components/forms/RegistrationFields';
 
 export interface CharityMe {
   user: { id: string; email: string; name: string | null; role: 'owner' | 'member' };
@@ -16,6 +17,25 @@ export interface CharityMe {
     tax_id: string | null;
     bunnings_store_id: string | null;
     subscription_status: string;
+    trading_name: string | null;
+    organisation_type: string | null;
+    acnc_registration: string | null;
+    registered_address: string | null;
+    state: string | null;
+    website: string | null;
+    contact_position: string | null;
+    contact_phone: string | null;
+    contact_email: string | null;
+    confirmed_authorised_contact: boolean;
+    confirmed_accurate_information: boolean;
+    accepted_terms: boolean;
+    acknowledged_privacy_policy: boolean;
+    consented_to_contact: boolean;
+    acknowledged_fees: boolean;
+    fundraising_authority_details: string | null;
+    fundraising_purpose: string | null;
+    short_description: string | null;
+    fundraising_approver_name: string | null;
     created_at: string;
     bunnings_stores: { id: string; location: string; suburb: string | null; postcode: string | null } | null;
   };
@@ -66,7 +86,10 @@ export interface CharityPerson {
 
 export const charityApi = {
   me: () => api.get<{ data: CharityMe }>('/api/charity/me'),
-  updateProfile: (input: Partial<Pick<CharityMe['charity'], 'contact_name' | 'email' | 'phone' | 'location' | 'postcode' | 'bunnings_store_id'>>) =>
+  updateProfile: (
+    input: Partial<Pick<CharityMe['charity'], 'contact_name' | 'email' | 'phone' | 'location' | 'postcode' | 'bunnings_store_id'>> &
+      Partial<ReturnType<typeof toRegistrationPayload>>
+  ) =>
     api.patch<{ data: CharityMe['charity'] }>('/api/charity/profile', input),
   events: () => api.get<{ data: CharityEvent[] }>('/api/charity/events'),
   event: (id: string) => api.get<{ data: CharityEvent }>(`/api/charity/events/${id}`),

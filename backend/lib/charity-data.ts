@@ -32,7 +32,7 @@ export const charityRegistrationFields = {
 };
 
 export const CHARITY_SAFE_COLUMNS =
-  'id, name, email, phone, location, contact_name, postcode, tax_id, bunnings_store_id, subscription_status, created_at, bunnings_stores(id, location, suburb, postcode)';
+  'id, name, email, phone, location, contact_name, postcode, tax_id, bunnings_store_id, subscription_status, created_at, trading_name, organisation_type, acnc_registration, registered_address, state, website, contact_position, contact_phone, contact_email, confirmed_authorised_contact, confirmed_accurate_information, accepted_terms, acknowledged_privacy_policy, consented_to_contact, acknowledged_fees, fundraising_authority_details, fundraising_purpose, short_description, fundraising_approver_name, bunnings_stores(id, location, suburb, postcode)';
 
 export const CHARITY_EVENT_COLUMNS =
   'id, event_date, event_name, status, cover_type, estimated_hotdogs, estimated_staff, number_of_shifts, actual_hotdogs_sold, number_of_sales, sales_value_aud, requested_by_charity, created_at, bunnings_stores(id, location, suburb, state, postcode, store_address, store_phone), event_packages(quantity, packages(name))';

@@ -8,6 +8,14 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { FormWrapper } from '@/components/forms/FormWrapper';
+import {
+  RegistrationFields,
+  registrationFieldsSchema,
+  registrationToFormValues,
+  toRegistrationPayload,
+  type RegistrationFormValues,
+} from '@/components/forms/RegistrationFields';
 
 function errText(err: unknown) {
   if (err instanceof ApiRequestError) {
@@ -210,6 +218,48 @@ function People() {
   );
 }
 
+function RegistrationDetails() {
+  const { me, reload } = useCharity();
+  const approved = me.charity.subscription_status === 'active';
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const save = async (values: RegistrationFormValues) => {
+    setMsg(null);
+    await charityApi.updateProfile(toRegistrationPayload(values));
+    await reload();
+    setMsg('Your registration details have been saved.');
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Registration details</CardTitle>
+      </CardHeader>
+      <FormWrapper
+        schema={registrationFieldsSchema}
+        defaultValues={registrationToFormValues(me.charity)}
+        onSubmit={save}
+        className="space-y-4"
+      >
+        {!approved && (
+          <p className="text-sm text-charcoal/70">
+            You can add these details once your charity has been approved. Please use Contact us if you need to update them sooner.
+          </p>
+        )}
+        <fieldset disabled={!approved} className="contents">
+          <RegistrationFields />
+        </fieldset>
+        {msg && <p className="text-sm text-green-700">{msg}</p>}
+        {approved && (
+          <Button type="submit" className="w-full">
+            Save registration details
+          </Button>
+        )}
+      </FormWrapper>
+    </Card>
+  );
+}
+
 export default function CharityProfilePage() {
   return (
     <CharityLayout>
@@ -217,6 +267,9 @@ export default function CharityProfilePage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Details />
         <People />
+      </div>
+      <div className="mt-6 max-w-2xl">
+        <RegistrationDetails />
       </div>
     </CharityLayout>
   );
