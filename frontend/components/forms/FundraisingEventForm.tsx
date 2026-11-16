@@ -109,10 +109,12 @@ function FilterableSelect({
   allOptions,
   selectedValue,
   placeholder,
+  required,
 }: {
   label: string;
   name: 'bunnings_store_id' | 'charity_id';
   error?: string;
+  required?: boolean;
   allOptions: SelectOption[];
   selectedValue: string;
   placeholder: string;
@@ -129,14 +131,14 @@ function FilterableSelect({
   return (
     <div className="space-y-1">
       <Input
-        label={`${label} — type to narrow the list`}
+        label={`${label}${required ? ' *' : ''} — type to narrow the list`}
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         placeholder="Name, suburb or postcode"
         aria-label={`Filter ${label}`}
         name={`${name}-filter`}
       />
-      <Select aria-label={label} error={error} placeholder={placeholder} options={options} defaultValue="" {...register(name)} />
+      <Select aria-label={label} required={required} error={error} placeholder={placeholder} options={options} defaultValue="" {...register(name)} />
     </div>
   );
 }
@@ -159,9 +161,10 @@ function EventFields({ storeOptions, charityOptions, selectedStore, selectedChar
   return (
     <div className="space-y-4">
       {loadError && <p className="text-sm text-red-600">{loadError}</p>}
-      <Input label="Event date" type="date" error={errors.event_date?.message} {...register('event_date')} />
+      <Input label="Event date" type="date" required error={errors.event_date?.message} {...register('event_date')} />
       <FilterableSelect
         label="Bunnings store"
+        required
         name="bunnings_store_id"
         error={errors.bunnings_store_id?.message}
         allOptions={storeOptions}
@@ -170,13 +173,14 @@ function EventFields({ storeOptions, charityOptions, selectedStore, selectedChar
       />
       <FilterableSelect
         label="Charity"
+        required
         name="charity_id"
         error={errors.charity_id?.message}
         allOptions={charityOptions}
         selectedValue={charity}
         placeholder="Choose a charity"
       />
-      <Select label="Status" options={EVENT_STATUS_OPTIONS} error={errors.status?.message} {...register('status')} />
+      <Select label="Status" required options={EVENT_STATUS_OPTIONS} error={errors.status?.message} {...register('status')} />
 
       <fieldset className="space-y-4 border-t border-grey pt-4">
         <legend className="text-sm font-semibold text-navy">Event details</legend>

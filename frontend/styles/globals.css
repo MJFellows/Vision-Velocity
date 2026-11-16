@@ -19,6 +19,7 @@
 @layer components {
   /* Shared focus ring used by all interactive UI primitives (Button, Input, Select, etc.) */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+    /* Navy, not accent red: red reads as 'error' or 'required' on a focused field. */
+    @apply focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2;
   }
 }

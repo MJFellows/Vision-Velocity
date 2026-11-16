@@ -46,7 +46,7 @@ function StoreFields() {
 
   return (
     <div className="space-y-4">
-      <Input label="Store name / location" error={errors.location?.message} {...register('location')} />
+      <Input label="Store name / location" required error={errors.location?.message} {...register('location')} />
       <Input label="Store address" error={errors.store_address?.message} {...register('store_address')} />
       <Input label="Store phone" type="tel" error={errors.store_phone?.message} {...register('store_phone')} />
 

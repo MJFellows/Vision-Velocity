@@ -55,7 +55,7 @@ function SupplierContactFields() {
 
   return (
     <div className="space-y-4">
-      <Input label="Contact name" error={errors.contact_person_name?.message} {...register('contact_person_name')} />
+      <Input label="Contact name" required error={errors.contact_person_name?.message} {...register('contact_person_name')} />
       <Input label="Email" type="email" error={errors.contact_email?.message} {...register('contact_email')} />
       <Input label="Phone" type="tel" error={errors.contact_phone?.message} {...register('contact_phone')} />
       <Select
@@ -72,6 +72,7 @@ function SupplierContactFields() {
       />
       <Select
         label="Negotiation status"
+        required
         error={errors.status?.message}
         options={[
           { value: 'interested', label: 'Interested' },

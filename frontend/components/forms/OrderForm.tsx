@@ -84,10 +84,10 @@ function OrderFields({ charities, packages, loadError }: { charities: Charity[];
           first.
         </p>
       )}
-      <Select label="Charity" placeholder="Choose a charity" options={charityOptions} error={errors.charity_id?.message} {...register('charity_id')} />
-      <Select label="Package" placeholder="Choose a package" options={packageOptions} error={errors.package_id?.message} {...register('package_id')} />
-      <Input label="Event date" type="date" error={errors.event_date?.message} {...register('event_date')} />
-      <Input label="Delivery address" error={errors.delivery_address?.message} {...register('delivery_address')} />
+      <Select label="Charity" required placeholder="Choose a charity" options={charityOptions} error={errors.charity_id?.message} {...register('charity_id')} />
+      <Select label="Package" required placeholder="Choose a package" options={packageOptions} error={errors.package_id?.message} {...register('package_id')} />
+      <Input label="Event date" type="date" required error={errors.event_date?.message} {...register('event_date')} />
+      <Input label="Delivery address" required error={errors.delivery_address?.message} {...register('delivery_address')} />
       <Input label="Delivery contact name" error={errors.delivery_contact_name?.message} {...register('delivery_contact_name')} />
       <Input label="Delivery phone" type="tel" error={errors.delivery_phone?.message} {...register('delivery_phone')} />
       <div>
@@ -101,7 +101,7 @@ function OrderFields({ charities, packages, loadError }: { charities: Charity[];
           {...register('special_requests')}
         />
       </div>
-      <Input label="Total price (AUD)" type="number" step="0.01" min="0" error={errors.total_price_aud?.message} {...register('total_price_aud')} />
+      <Input label="Total price (AUD)" required type="number" step="0.01" min="0" error={errors.total_price_aud?.message} {...register('total_price_aud')} />
     </div>
   );
 }

@@ -39,7 +39,7 @@ function CharityFields() {
 
   return (
     <div className="space-y-4">
-      <Input label="Charity name" error={errors.name?.message} {...register('name')} />
+      <Input label="Charity name" required error={errors.name?.message} {...register('name')} />
       <Input label="Contact name" error={errors.contact_name?.message} {...register('contact_name')} />
       <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
       <Input label="Phone" error={errors.phone?.message} {...register('phone')} />

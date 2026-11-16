@@ -25,6 +25,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label htmlFor={selectId} className="mb-1 block text-sm font-medium text-charcoal">
             {label}
+            {rest.required && (
+              <span aria-hidden="true" className="ml-0.5 font-bold text-charcoal">
+                *
+              </span>
+            )}
           </label>
         )}
         <select

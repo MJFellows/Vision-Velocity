@@ -90,14 +90,14 @@ function SupplierFields({ chainOptions }: { chainOptions: SelectOption[] }) {
 
       <fieldset className="space-y-4">
         <legend className="mb-2 text-sm font-semibold text-navy">Store details</legend>
-        <Select label="Supplier chain" options={chainOptions} error={errors.supplier_chain?.message} {...register('supplier_chain')} />
-        <Input label="Store name" error={errors.store_name?.message} {...register('store_name')} />
+        <Select label="Supplier chain" required options={chainOptions} error={errors.supplier_chain?.message} {...register('supplier_chain')} />
+        <Input label="Store name" required error={errors.store_name?.message} {...register('store_name')} />
         <Input label="Store ID" error={errors.source_store_id?.message} {...register('source_store_id')} />
         <Input label="Address" error={errors.address?.message} {...register('address')} />
         <Input label="Suburb" error={errors.suburb?.message} {...register('suburb')} />
         <div className="grid grid-cols-2 gap-4">
-          <Select label="State" options={STATE_OPTIONS} error={errors.state?.message} {...register('state')} />
-          <Input label="Postcode" inputMode="numeric" maxLength={4} error={errors.postcode?.message} {...register('postcode')} />
+          <Select label="State" required options={STATE_OPTIONS} error={errors.state?.message} {...register('state')} />
+          <Input label="Postcode" required inputMode="numeric" maxLength={4} error={errors.postcode?.message} {...register('postcode')} />
         </div>
         <Input label="Store phone" type="tel" error={errors.phone?.message} {...register('phone')} />
         <Select

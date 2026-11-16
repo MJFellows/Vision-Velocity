@@ -28,6 +28,7 @@ function InteractionFields() {
     <div className="space-y-4">
       <Select
         label="Type"
+        required
         options={[
           { value: 'note', label: 'Note' },
           { value: 'phone_call', label: 'Phone call' },
@@ -40,6 +41,7 @@ function InteractionFields() {
       />
       <Select
         label="Direction"
+        required
         options={[
           { value: 'outbound', label: 'Outbound (we contacted them)' },
           { value: 'inbound', label: 'Inbound (they contacted us)' },
