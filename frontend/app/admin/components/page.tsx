@@ -174,7 +174,7 @@ function ComponentEditor({
   return (
     <form onSubmit={submit} className="space-y-3">
       {error && <p className="rounded-card border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <Input label="Name" value={d.name} onChange={set('name')} placeholder="e.g. Beef sausages" />
+      <Input label="Name" required value={d.name} onChange={set('name')} placeholder="e.g. Beef sausages" />
       <Input label="Pack size" value={d.pack_size} onChange={set('pack_size')} placeholder="e.g. Carton of 60" />
       <div className="grid grid-cols-2 gap-3">
         <Input label="Quantity" inputMode="decimal" value={d.quantity} onChange={set('quantity')} placeholder="e.g. 500" />
