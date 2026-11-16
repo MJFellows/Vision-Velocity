@@ -41,15 +41,37 @@ function PackageEditor({
   submitLabel,
   onSave,
   onCancel,
+  onDelete,
 }: {
   initial: Draft;
   submitLabel: string;
   onSave: (d: Draft) => Promise<void>;
   onCancel?: () => void;
+  onDelete?: () => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Draft>(initial);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const remove = async () => {
+    if (!onDelete) return;
+    const name = initial.name.trim() || 'this package';
+    if (
+      !window.confirm(
+        `Delete ${name}? The package will be archived: it will no longer appear on the Packages list, the event form or the public site. Events and orders that already use it keep their link.`
+      )
+    ) {
+      return;
+    }
+    setError(null);
+    setSaving(true);
+    try {
+      await onDelete();
+    } catch (err) {
+      setError(errorText(err));
+      setSaving(false);
+    }
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -69,14 +91,16 @@ function PackageEditor({
   return (
     <form onSubmit={submit} className="space-y-3">
       {error && <p className="rounded-card border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <Input label="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+      <p className="text-xs text-charcoal/70">Fields marked * are required. Other fields are optional.</p>
+      <Input label="Name" required value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
       <Input
-        label="Description"
+        label="Description (optional)"
         value={draft.description}
         onChange={(e) => setDraft({ ...draft, description: e.target.value })}
       />
       <Input
         label="Base price ($)"
+        required
         inputMode="decimal"
         value={draft.price}
         onChange={(e) => setDraft({ ...draft, price: e.target.value })}
@@ -93,6 +117,16 @@ function PackageEditor({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
+        )}
+        {onDelete && (
+          <button
+            type="button"
+            onClick={remove}
+            disabled={saving}
+            className="ml-auto text-sm text-red-700 underline disabled:opacity-50"
+          >
+            Delete package
+          </button>
         )}
       </div>
     </form>
@@ -276,6 +310,13 @@ export default function PackagesPage() {
                     }}
                     submitLabel="Save"
                     onCancel={() => setEditingId(null)}
+                    onDelete={async () => {
+                      await updatePackage(p.id, { is_deleted: true });
+                      setEditingId(null);
+                      setContentsId(null);
+                      setMessage(`Archived ${p.name}.`);
+                      await load();
+                    }}
                     onSave={async (d) => {
                       await updatePackage(p.id, toInput(d));
                       setEditingId(null);
