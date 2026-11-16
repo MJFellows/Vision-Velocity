@@ -122,17 +122,39 @@ function ComponentEditor({
   submitLabel,
   onSave,
   onCancel,
+  onDelete,
 }: {
   initial: Draft;
   units: string[];
   submitLabel: string;
   onSave: (input: ComponentInput) => Promise<void>;
   onCancel?: () => void;
+  onDelete?: () => Promise<void>;
 }) {
   const [d, setD] = useState<Draft>(initial);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const set = (k: keyof Draft) => (e: { target: { value: string } }) => setD({ ...d, [k]: e.target.value });
+
+  const remove = async () => {
+    if (!onDelete) return;
+    const name = initial.name.trim() || 'this component';
+    if (
+      !window.confirm(
+        `Delete ${name}? The component will be archived and removed from the Components list. It cannot be deleted while it is still in an active package.`
+      )
+    ) {
+      return;
+    }
+    setError(null);
+    setSaving(true);
+    try {
+      await onDelete();
+    } catch (err) {
+      setError(errorText(err));
+      setSaving(false);
+    }
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -203,6 +225,16 @@ function ComponentEditor({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
+        )}
+        {onDelete && (
+          <button
+            type="button"
+            onClick={remove}
+            disabled={saving}
+            className="ml-auto text-sm text-red-700 underline disabled:opacity-50"
+          >
+            Delete component
+          </button>
         )}
       </div>
     </form>
@@ -326,6 +358,12 @@ export default function ComponentsPage() {
                         replace((await updateComponent(c.id, input)).data);
                         setEditingId(null);
                         setMessage(`Saved ${input.name}.`);
+                      }}
+                      onDelete={async () => {
+                        await updateComponent(c.id, { is_deleted: true });
+                        setEditingId(null);
+                        setMessage(`Archived ${c.name}.`);
+                        await load();
                       }}
                     />
                   </div>

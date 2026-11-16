@@ -43,6 +43,22 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (beforeError) throw beforeError;
     if (!before) throw new NotFoundError('Component not found');
 
+    // Archiving keeps the row, so refuse while the component is still in an active package.
+    if (parsed.data.is_deleted) {
+      const { data: links, error: linksError } = await supabase
+        .from('package_components')
+        .select('packages(name, is_deleted)')
+        .eq('component_id', id);
+      if (linksError) throw linksError;
+      const inUse = (links ?? [])
+        .map((l) => l.packages as unknown as { name: string; is_deleted: boolean } | null)
+        .filter((p): p is { name: string; is_deleted: boolean } => p !== null && !p.is_deleted)
+        .map((p) => p.name);
+      if (inUse.length > 0) {
+        throw new ConflictError(`${before.name} is still used in: ${inUse.join(', ')}. Remove it from those packages first.`);
+      }
+    }
+
     const { data, error } = await supabase.from('components').update(parsed.data).eq('id', id).select(COMPONENT_COLUMNS).single();
     if (error) {
       const msg = componentWriteError(error);
