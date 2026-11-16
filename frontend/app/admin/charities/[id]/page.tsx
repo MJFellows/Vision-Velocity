@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge, toneForStatus } from '@/components/ui/Badge';
 import { Tabs } from '@/components/ui/Tabs';
 import type { FundraisingEvent } from '@/lib/types';
-import { CharityForm, type CharityFormValues } from '@/components/forms/CharityForm';
+import { CharityForm, toCharityPayload, type CharityFormValues } from '@/components/forms/CharityForm';
 import { InteractionForm, type InteractionFormValues } from '@/components/forms/InteractionForm';
 import { SamePostcodePanel, type PanelSection } from '@/components/SamePostcodePanel';
 import { CharityAccessCard } from '@/components/CharityAccessCard';
@@ -68,15 +68,7 @@ export default function CharityDetailPage() {
   }, [loadCharity, loadOrders, loadEvents]);
 
   const handleEditSubmit = async (values: CharityFormValues) => {
-    await updateCharity(id, {
-      name: values.name,
-      email: values.email || null,
-      phone: values.phone || null,
-      location: values.location || null,
-      postcode: values.postcode || null,
-      contact_name: values.contact_name || null,
-      tax_id: values.tax_id || null,
-    });
+    await updateCharity(id, toCharityPayload(values));
     setIsEditing(false);
     await loadCharity();
   };
@@ -271,6 +263,49 @@ export default function CharityDetailPage() {
               <dt className="text-charcoal/70">ABN / tax ID</dt>
               <dd>{charity.tax_id || '—'}</dd>
             </div>
+          </dl>
+        </Card>
+      )}
+
+      {!isEditing && (
+        <Card className="mb-6 max-w-lg">
+          <CardHeader>
+            <CardTitle>Registration details</CardTitle>
+          </CardHeader>
+          <dl className="space-y-2 text-sm">
+            {[
+              ['Trading name', charity.trading_name],
+              ['Organisation type', charity.organisation_type?.replace(/_/g, ' ')],
+              ['ACNC registration', charity.acnc_registration],
+              ['Registered address', charity.registered_address],
+              ['State or territory', charity.state],
+              ['Website', charity.website],
+              ['Contact position', charity.contact_position],
+              ['Contact phone', charity.contact_phone],
+              ['Contact email', charity.contact_email],
+              ['Fundraising authority details', charity.fundraising_authority_details],
+              ['Fundraising purpose', charity.fundraising_purpose],
+              ['Short description', charity.short_description],
+              ['Fundraising approver', charity.fundraising_approver_name],
+            ].map(([label, value]) => (
+              <div key={label as string} className="flex justify-between gap-4">
+                <dt className="text-charcoal/70">{label}</dt>
+                <dd className="text-right">{(value as string | null) || '—'}</dd>
+              </div>
+            ))}
+            {[
+              ['Authorised contact confirmed', charity.confirmed_authorised_contact],
+              ['Information confirmed accurate', charity.confirmed_accurate_information],
+              ['Terms accepted', charity.accepted_terms],
+              ['Privacy policy acknowledged', charity.acknowledged_privacy_policy],
+              ['Consent to contact', charity.consented_to_contact],
+              ['Fees acknowledged', charity.acknowledged_fees],
+            ].map(([label, value]) => (
+              <div key={label as string} className="flex justify-between gap-4">
+                <dt className="text-charcoal/70">{label}</dt>
+                <dd>{value ? 'Yes' : 'No'}</dd>
+              </div>
+            ))}
           </dl>
         </Card>
       )}

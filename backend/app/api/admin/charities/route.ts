@@ -16,6 +16,7 @@ import { ValidationError, ConflictError, handleApiError } from '@/utils/errors';
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction } from '@/lib/audit';
+import { charityRegistrationFields } from '@/lib/charity-data';
 
 const createCharitySchema = z.object({
   name: z.string().min(2).max(100),
@@ -28,6 +29,7 @@ const createCharitySchema = z.object({
   bunnings_store_id: z.string().uuid().optional().nullable(),
   internal_notes: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
+  ...charityRegistrationFields,
 });
 
 export async function GET(request: Request) {

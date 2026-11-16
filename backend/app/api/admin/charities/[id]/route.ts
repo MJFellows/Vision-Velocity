@@ -5,6 +5,7 @@ import { ValidationError, NotFoundError, ConflictError, handleApiError } from '@
 import { buildCorsHeaders } from '@/utils/cors';
 import { getClientIp } from '@/utils/rateLimit';
 import { logAdminAction, diffChanges, getAuditTrail, getAdminActionLog } from '@/lib/audit';
+import { charityRegistrationFields } from '@/lib/charity-data';
 
 const updateCharitySchema = z
   .object({
@@ -21,6 +22,7 @@ const updateCharitySchema = z
     internal_notes: z.string().nullable(),
     tags: z.array(z.string()),
     is_deleted: z.boolean(),
+    ...charityRegistrationFields,
   })
   .partial();
 

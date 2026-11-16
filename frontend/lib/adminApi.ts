@@ -60,7 +60,7 @@ export function getCharity(id: string, includeAudit = false) {
 }
 
 export type CreateCharityInput = Pick<Charity, 'name'> &
-  Partial<Pick<Charity, 'email' | 'phone' | 'location' | 'postcode' | 'contact_name' | 'tax_id' | 'bunnings_store_id' | 'internal_notes' | 'tags'>>;
+  Partial<Pick<Charity, 'email' | 'phone' | 'location' | 'postcode' | 'contact_name' | 'tax_id' | 'bunnings_store_id' | 'internal_notes' | 'tags' | 'trading_name' | 'organisation_type' | 'acnc_registration' | 'registered_address' | 'state' | 'website' | 'contact_position' | 'contact_phone' | 'contact_email' | 'confirmed_authorised_contact' | 'confirmed_accurate_information' | 'accepted_terms' | 'acknowledged_privacy_policy' | 'consented_to_contact' | 'acknowledged_fees' | 'fundraising_authority_details' | 'fundraising_purpose' | 'short_description' | 'fundraising_approver_name'>>;
 
 export function createCharity(input: CreateCharityInput) {
   return api.post<{ data: Charity }>('/api/admin/charities', input);

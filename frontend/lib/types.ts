@@ -90,6 +90,26 @@ export interface Charity {
   bunnings_store_id: string | null;
   internal_notes: string | null;
   tags: string[]; // jsonb, e.g. ["high_value", "at_risk", "new", "loyal"]
+  // Registration details (all optional; see database/migrations/20261116_charities_registration_details.sql)
+  trading_name: string | null;
+  organisation_type: string | null;
+  acnc_registration: string | null;
+  registered_address: string | null;
+  state: string | null;
+  website: string | null;
+  contact_position: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  confirmed_authorised_contact: boolean;
+  confirmed_accurate_information: boolean;
+  accepted_terms: boolean;
+  acknowledged_privacy_policy: boolean;
+  consented_to_contact: boolean;
+  acknowledged_fees: boolean;
+  fundraising_authority_details: string | null;
+  fundraising_purpose: string | null;
+  short_description: string | null;
+  fundraising_approver_name: string | null;
   auth_user_id: string | null;
   created_at: string;
   updated_at: string;
